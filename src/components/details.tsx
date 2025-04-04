@@ -3,13 +3,13 @@ import Image from "next/image";
 export default function Details() {
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-75">
-      <div className="bg-white p-6 rounded-lg border-2 border-black w-96 relative">
+      <div className="bg-white p-12 rounded-lg border-2 border-black relative grid grid-cols-1 sm:grid-cols-[1fr_2fr] w-full max-w-[1300px] max-h-[900px] m-12 overflow-auto gap-6">
         <button className="absolute top-2 right-2 text-gray-600 hover:text-black">
           ✖
         </button>
 
         {/* First Column: Picture, Basic Details, Base Stats */}
-        <div>
+        <div className="w-full">
           {/* Picture */}
           <div className="relative w-full flex justify-center items-center ">
             {/* Background Rectangle */}
@@ -26,7 +26,7 @@ export default function Details() {
           </div>
 
           {/* Types and Name */}
-          <div className="font-mono pl-4 mt-1">
+          <div className="font-mono sm:pl-4 mt-1">
             <div className="flex gap-1">
               <h1 className="font-semibold text-md text-white bg-red-500 px-2 rounded-xl">
                 Fire
@@ -40,15 +40,94 @@ export default function Details() {
           </div>
 
           {/* Description */}
-          <p className="font-mono font-bold text-gray-700 text-xl tracking-tight pl-4 mt-2">
+          <p className="font-mono font-bold text-gray-700 text-xl tracking-tight sm:pl-4 mt-2">
             Often hides in water to stalk unwary prey. For swimming fast, it
             moves its ears to maintain balance.
           </p>
 
           {/* Base Stats */}
+          <div className="flex flex-col gap-2 mt-4 sm:pl-4">
+            <h1 className="text-2xl font-bold">Base Stats</h1>
+            <div className="flex justify-between">
+              <span>HP</span>
+              <span>45</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Attack</span>
+              <span>49</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Defense</span>
+              <span>65</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Special Attack</span>
+              <span>65</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Special Defense</span>
+              <span>55</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Speed</span>
+              <span>45</span>
+            </div>
+          </div>
         </div>
 
         {/* Second Column: Pokedex Data, Training, Defenses, Evolution */}
+        <div className="flex flex-col gap-4 sm:pl-12">
+          {/* Pokedex Data */}
+          <h1 className="text-2xl font-bold">Pokédex Data</h1>
+          <div className="flex w-full gap-4">
+            <div className="flex flex-col gap-2 font-bold text-gray-600">
+              <span>Species</span>
+              <span>Height</span>
+              <span>Weight</span>
+              <span>Abilities</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <span>Bug Pokémon</span>
+              <span>1'00"</span>
+              <span>6.4 lbs</span>
+              <span>Shield Dust</span>
+            </div>
+          </div>
+
+          {/* Pokedex Data */}
+          <h1 className="text-2xl font-bold">Pokédex Data</h1>
+          <div className="flex w-full gap-4">
+            <div className="flex flex-col gap-2 font-bold text-gray-600">
+              <span>Species</span>
+              <span>Height</span>
+              <span>Weight</span>
+              <span>Abilities</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <span>Bug Pokémon</span>
+              <span>1'00"</span>
+              <span>6.4 lbs</span>
+              <span>Shield Dust</span>
+            </div>
+          </div>
+
+          {/* Pokedex Data */}
+          <h1 className="text-2xl font-bold">Pokédex Data</h1>
+          <div className="flex w-full gap-4">
+            <div className="flex flex-col gap-2 font-bold text-gray-600">
+              <span>Species</span>
+              <span>Height</span>
+              <span>Weight</span>
+              <span>Abilities</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <span>Bug Pokémon</span>
+              <span>1'00"</span>
+              <span>6.4 lbs</span>
+              <span>Shield Dust</span>
+            </div>
+          </div>
+        </div>
 
         {/* Background Element of ID */}
       </div>
