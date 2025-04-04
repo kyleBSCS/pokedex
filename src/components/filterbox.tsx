@@ -12,8 +12,8 @@ export default function FilterBox() {
         className={`
         sm:m-12                  
         relative bg-black shadow-lg
-        w-full md:w-[500px]  
-        h-[500px]             
+        w-full sm:w-[500px]  
+        h-[700px]             
         p-[2px]               
         md:flex-shrink-0      
       `}
@@ -34,23 +34,53 @@ export default function FilterBox() {
           }}
         >
           {/* Content */}
-          <h1 className="text-xl font-bold mb-4">Filter by</h1>
-          <div className="grid grid-cols-3 gap-1">
-            <Button name="Grass" />
-            <Button name="Fire" />
-            <Button name="Water" />
-            <Button name="Electric" />
-            <Button name="Psychic" />
-            <Button name="Dark" />
-            <Button name="Fairy" />
-            <Button name="Steel" />
-            <Button name="Dragon" />
-            <Button name="Ghost" />
-            <Button name="Bug" />
-            <Button name="Rock" />
-            <Button name="Ground" />
-            <Button name="Poison" />
-            <Button name="Flying" />
+          <div className="flex flex-col gap-2">
+            {/* Header */}
+            <h1 className="text-6xl font-bold mb-4 mt-3">POKÉDEX</h1>
+
+            {/* Search Bar */}
+            <div className="flex items-center mb-4">
+              <input
+                type="text"
+                placeholder="Search Pokémon (Name, ID, Ability)"
+                className="border border-gray-300 rounded-md p-2 w-full"
+              />
+              <button className="bg-blue-600 font-bold text-white rounded-full p-2 ml-2">
+                Search
+              </button>
+            </div>
+
+            {/* Filters */}
+            <div className="mb-4">
+              <h1 className="text-2xl font-bold mb-4">Filter by</h1>
+              <div className="grid grid-cols-3 gap-1">
+                <Button name="Grass" />
+                <Button name="Fire" />
+                <Button name="Water" />
+                <Button name="Electric" />
+                <Button name="Psychic" />
+                <Button name="Dark" />
+                <Button name="Fairy" />
+                <Button name="Steel" />
+                <Button name="Dragon" />
+                <Button name="Ghost" />
+                <Button name="Bug" />
+                <Button name="Rock" />
+                <Button name="Ground" />
+                <Button name="Poison" />
+                <Button name="Flying" />
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div>
+              <h1 className="text-2xl font-bold mb-4">Sort by</h1>
+              <div className="grid grid-cols-3 gap-1">
+                <Button name="Grass" />
+                <Button name="Fire" />
+                <Button name="Water" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
