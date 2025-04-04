@@ -10,7 +10,7 @@ export default function FilterBox() {
     <div className="p-4">
       <div
         className={`
-        sm:m-12                  
+        sm:mx-12            
         relative bg-black shadow-lg
         w-full sm:w-[500px]  
         h-[700px]             

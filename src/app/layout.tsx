@@ -26,16 +26,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <div className="w-screen h-16 bg-white sticky top-0 border-b-2 border-black z-10">
-        <div className="flex items-center justify-start h-full pl-12">
-          <h1 className="text-3xl font-bold font-mono text-gray-800">
-            Pokédex
-          </h1>
-        </div>
-      </div>
       <body
         className={`${leagueGothic.variable} ${ibmPlexSansCondensed.variable} antialiased`}
       >
+        <div className="w-screen h-16 bg-white sticky top-0 border-b-2 border-black z-10">
+          <div className="flex items-center justify-start h-full pl-12">
+            <h1 className="text-3xl font-bold font-mono text-gray-800">
+              Pokédex
+            </h1>
+          </div>
+        </div>
         {children}
       </body>
     </html>
