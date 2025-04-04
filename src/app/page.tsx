@@ -2,6 +2,7 @@ import Card from "@/components/card";
 import FilterBox from "@/components/filterbox";
 import Image from "next/image";
 import * as motion from "motion/react-client";
+import Details from "@/components/details";
 
 const cardItems = Array.from({ length: 20 }, (_, index) => index);
 
@@ -42,6 +43,8 @@ export default function Home() {
           ))}
         </div>
       </div>
+      <Details />
+
       {/* Background Image */}
       <div className="fixed bottom-0 right-0 w-full h-full -z-10">
         <Image
