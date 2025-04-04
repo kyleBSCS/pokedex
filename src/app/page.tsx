@@ -1,12 +1,13 @@
 import Card from "@/components/card";
+import FilterBox from "@/components/filterbox";
 import Image from "next/image";
 
 export default function Home() {
   return (
     <div className="font-mono">
-      <div className="mx-auto mt-12 flex flex-col md:flex-row items-center justify-center">
+      <div className="mx-auto mt-12 flex flex-col md:flex-row justify-center">
         {/* Filter Box */}
-        <div className="w-[1500px]"></div>
+        <FilterBox/>
 
         {/* Main Card List */}
         <div className="flex flex-col sm:flex-row flex-wrap gap-2">
