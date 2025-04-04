@@ -7,10 +7,10 @@ export default function Home() {
     <div className="font-mono">
       <div className="mx-auto mt-12 flex flex-col md:flex-row justify-center">
         {/* Filter Box */}
-        <FilterBox/>
+        <FilterBox />
 
         {/* Main Card List */}
-        <div className="flex flex-col sm:flex-row flex-wrap gap-2">
+        <div className="w-full md:w-auto flex flex-row flex-wrap gap-2 p-4 md:flex-1 justify-center md:justify-start">
           <Card />
           <Card />
           <Card />

@@ -16,6 +16,8 @@ export default function FilterBox() {
         h-[700px]             
         p-[2px]               
         md:flex-shrink-0      
+        md:sticky
+        md:top-32
       `}
         style={{
           clipPath: clipPathStyle,
