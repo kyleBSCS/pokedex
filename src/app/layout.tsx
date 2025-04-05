@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Condensed, League_Gothic } from "next/font/google";
 import "./globals.css";
+import TopBar from "@/components/topbar";
 
 const ibmPlexSansCondensed = IBM_Plex_Sans_Condensed({
   subsets: ["latin"],
@@ -16,7 +17,7 @@ const leagueGothic = League_Gothic({
 
 export const metadata: Metadata = {
   title: "Pokédex",
-  description: "By Kyle Nathaniel Vinuya",
+  description: "By Kyle Nathaniel Vinuya for Old.St Labs",
 };
 
 export default function RootLayout({
@@ -29,13 +30,7 @@ export default function RootLayout({
       <body
         className={`${leagueGothic.variable} ${ibmPlexSansCondensed.variable} antialiased`}
       >
-        <div className="w-screen h-16 bg-white sticky top-0 border-b-2 border-black z-10">
-          <div className="flex items-center justify-start h-full pl-12">
-            <h1 className="text-3xl font-bold font-mono text-gray-800">
-              Pokédex
-            </h1>
-          </div>
-        </div>
+        <TopBar />
         {children}
       </body>
     </html>
