@@ -149,6 +149,17 @@ export default function Home() {
           formatPokemonId(pokemon.id).includes(lowerSearchTerm)
       );
     }
+
+    // STEP 2: Filter by Selected Types
+    if (selectedTypes.length > 0) {
+      filtered = filtered.filter((pokemon) =>
+        selectedTypes.some((selectedType) =>
+          pokemon.types.includes(selectedType)
+        )
+      );
+    }
+
+    // STEP 3: Sort
   }, []);
 
   // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
