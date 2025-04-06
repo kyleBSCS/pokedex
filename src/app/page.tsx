@@ -34,6 +34,7 @@ export default function Home() {
   // For the trigger that loads more cards
   const observerRef = useRef<HTMLDivElement | null>(null);
 
+  // =-=-=-=-=-= FETCHER =-=-=-=-=-=
   // Memoized callback function for fetching pokemon
   const fetchPokemon = useCallback(async () => {
     // Prevent fetching if already loading, no more data, or an error occured
@@ -111,6 +112,7 @@ export default function Home() {
     }
   }, [isLoading, hasMore, offset, error, allFetchedPokemon.length]);
 
+  // =-=-=-=-=-= HANDLERS =-=-=-=-=-=
   // Filters and Sort to be passed to FilterBox
   const handleSearchChange = useCallback((term: string) => {
     setSearchTerm(term);
@@ -128,6 +130,28 @@ export default function Home() {
     setSortBy(sortKey);
   }, []);
 
+  // =-=-=-=-=-= COMPUTED VALUES =-=-=-=-=-=
+  const displayedCards = useMemo(() => {
+    console.log(
+      `Filtering/Sorting: Term='${searchTerm}', Types=[${selectedTypes.join(
+        ", "
+      )}], Sort='${sortBy}'`
+    );
+    let filtered = [...allFetchedPokemon];
+
+    // STEP 1: Filter by Search Term (Name or ID)
+    if (searchTerm.trim()) {
+      const lowerSearchTerm = searchTerm.trim().toLowerCase();
+      filtered = filtered.filter(
+        (pokemon) =>
+          pokemon.name.toLowerCase().includes(lowerSearchTerm) ||
+          pokemon.id.toString() === lowerSearchTerm ||
+          formatPokemonId(pokemon.id).includes(lowerSearchTerm)
+      );
+    }
+  }, []);
+
+  // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
   // Effect for initial load
   useEffect(() => {
     if (allFetchedPokemon.length === 0 && !error && !isLoading) {
