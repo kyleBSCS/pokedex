@@ -113,7 +113,7 @@ export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
       </div>
 
       {/* Types and Name */}
-      <div className="font-mono pl-4 mt-4">
+      <div className={`font-mono pl-4 ${name.split("-")[1] ? "mt-1" : "mt-5"}`}>
         <div className="flex gap-1">
           {/* Types */}
           {types.map((type) => (
@@ -127,8 +127,16 @@ export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
           ))}
         </div>
         <h1 className="text-3xl font-bold mt-1">
-          {name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()}
+          {name.split("-")[0].charAt(0).toUpperCase() +
+            name.split("-")[0].slice(1).toLowerCase()}
         </h1>
+
+        {name.split("-")[1] && (
+          <h2 className="-mt-1">
+            {name.split("-")[1].charAt(0).toUpperCase() +
+              name.split("-")[1].slice(1).toLowerCase()}
+          </h2>
+        )}
       </div>
     </motion.div>
   );

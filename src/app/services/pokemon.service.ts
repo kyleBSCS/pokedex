@@ -10,8 +10,7 @@ import {
 import { formatPokemonId } from "@/utils/helper";
 
 const BASE_URL = "https://pokeapi.co/api/v2";
-const MAX_POKEMON_ID = 1118;
-// Current max amount in api
+const MAX_POKEMON_ID = 1301;
 
 // =-=-=-=-=-=-= CACHE =-=-=-=-=-=-=-=
 // For caching
