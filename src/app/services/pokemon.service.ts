@@ -197,8 +197,19 @@ export async function getPokemon(
   console.log(`Sorted by "${sort}".`);
 
   // STEP 4: Apply Pagination
-  // STEP 5: Fetch Details for the Paginated List
-  // STEP 6: Return Results
+  const totalCount = filteredList.length;
+  const paginatedList = filteredList.slice(offset, offset + limit);
+  console.log(
+    `Paginated list: Offset=${offset}, Limit=${limit}. Count: ${paginatedList.length}. Total matching: ${totalCount}`
+  );
 
-  return { pokemon: detailedPokemon, totalCount: totalCount };
+  // STEP 5: Fetch Details for the Paginated List
+  const detailedPokemon = await getPokemonDetails(paginatedList);
+  console.log(`Fetched details for ${detailedPokemon.length}`);
+
+  // STEP 6: Return Results
+  return {
+    pokemon: detailedPokemon,
+    totalCount: totalCount,
+  };
 }
