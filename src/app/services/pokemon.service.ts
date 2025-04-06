@@ -12,11 +12,14 @@ const BASE_URL = "https://pokeapi.co/api/v2";
 const MAX_POKEMON_ID = 1025;
 // To be adjusted
 
+// =-=-=-=-=-=-= CACHE =-=-=-=-=-=-=-=
 // For caching
 let fullPokemonListCache: PokeApiResource[] | null = null;
 let cacheTimestamp: number | null = null;
 const CACHE_DURATION_MS = 10 * 60 * 1000; // Cache for 10 minutes
 
+// =-=-=-=-=-=-= HELPER =-=-=-=-=-=-=-=
+// Fetches full list of Pokemon names/URLs from PokeAPI or uses cache
 async function getFullPokemonList(): Promise<PokeApiResource[]> {
   // Check local storage
   const now = Date.now();
@@ -54,6 +57,7 @@ async function getFullPokemonList(): Promise<PokeApiResource[]> {
   }
 }
 
+// Fetches Pokemon belong to specific types
 async function getPokemonByTypes(types: string[]): Promise<PokeApiResource[]> {
   console.log(`Fetching Pokemon for types: ${types.join(", ")}`);
   const typePromises = types.map(async (type) => {
@@ -89,3 +93,47 @@ async function getPokemonByTypes(types: string[]): Promise<PokeApiResource[]> {
   );
   return uniquePokemon;
 }
+
+// Fetches detailed data for a list of Pokemon URLs
+async function getPokemonDetails(
+  pokemonResources: PokeApiResource[]
+): Promise<PokemonCardProps[]> {
+  if (!pokemonResources || pokemonResources.length === 0) {
+    return [];
+  }
+  const detailPromises = pokemonResources.map(async (resource) => {
+    try {
+      // Use the direct PokeAPI URL for details
+      const detailRes = await fetch(resource.url);
+      if (!detailRes.ok) {
+        console.warn(
+          `Failed to fetch details for ${resource.name}: ${detailRes.statusText}`
+        );
+        return null; // Skip this Pokemon if details fail
+      }
+      const detail: PokemonDetail = await detailRes.json();
+      return {
+        id: detail.id,
+        name: detail.name,
+        imageUrl:
+          detail.sprites.other?.["official-artwork"]?.front_default ??
+          detail.sprites.other?.dream_world?.front_default ??
+          detail.sprites.front_default ??
+          "/pokeball.svg", // fallback
+        types: detail.types.map((typeInfo) => typeInfo.type.name),
+      };
+    } catch (detailError) {
+      console.error(
+        `Error fetching details for ${resource.name}:`,
+        detailError
+      );
+      return null; // Skip on error
+    }
+  });
+
+  const detailedResults = await Promise.all(detailPromises);
+
+  return [];
+}
+
+// =-=-=-=-=-=-= MAIN SERVICE =-=-=-=-=-=-=-=
