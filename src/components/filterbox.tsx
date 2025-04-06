@@ -1,43 +1,80 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Button from "./button";
-import { POKEMON_TYPES } from "@/types/types";
-import { FilterBoxProps } from "@/types/types";
+import {
+  POKEMON_TYPES,
+  FilterBoxProps,
+  SortByType,
+  AppliedFilters,
+  MAX_POKEMON_ID,
+} from "@/types/types";
 
 export default function FilterBox({
-  searchTerm,
-  selectedTypes,
-  sortBy,
-  cardAmount,
-  onSearchChange,
-  onTypeToggle,
-  onSortChange,
-  onCardViewAmtChange,
+  initialSearchTerm,
+  initialSelectedTypes,
+  initialSortBy,
+  onApply,
 }: FilterBoxProps) {
-  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
-  const [localDisplayCount, setLocalDisplayCount] = useState(cardAmount);
+  const [localSearchTerm, setLocalSearchTerm] = useState(initialSearchTerm);
+  const [localSelectedTypes, setLocalSelectedTypes] = useState(
+    new Set(initialSelectedTypes)
+  );
+  const [localSortBy, setLocalSortBy] = useState<SortByType>(initialSortBy);
+
+  // Effect to sync local state if initial props change
+  useEffect(() => {
+    setLocalSearchTerm(initialSearchTerm);
+  }, [initialSearchTerm]);
 
   useEffect(() => {
-    setLocalSearchTerm(searchTerm);
-  }, [searchTerm]);
+    setLocalSelectedTypes(new Set(initialSelectedTypes));
+  }, [initialSelectedTypes]);
+
+  useEffect(() => {
+    setLocalSortBy(initialSortBy);
+  }, [initialSortBy]);
 
   // Update local state as user types
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLocalSearchChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setLocalSearchTerm(event.target.value);
   };
 
-  // Trigger the actual search (call parent function)
-  const handleSearchTrigger = () => {
-    // Pass the current value from the local state to the parent
-    onSearchChange(localSearchTerm);
+  const handleLocalTypeToggle = useCallback((type: string) => {
+    setLocalSelectedTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) {
+        next.delete(type);
+      } else {
+        next.add(type);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleLocalSortChange = useCallback((sortKey: SortByType) => {
+    setLocalSortBy(sortKey);
+  }, []);
+
+  const handleApplyClick = () => {
+    const appliedFilters: AppliedFilters = {
+      searchTerm: localSearchTerm,
+      selectedTypes: Array.from(localSelectedTypes), // Convert Set back to Array
+      sortBy: localSortBy,
+    };
+    console.log("Applying filters:", appliedFilters);
+    onApply(appliedFilters);
   };
 
   // Handle Enter key press in the input field
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSearchKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      handleSearchTrigger();
+      handleApplyClick();
     }
   };
 
@@ -84,17 +121,11 @@ export default function FilterBox({
               <input
                 type="text"
                 value={localSearchTerm}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
+                onChange={handleLocalSearchChange}
+                onKeyDown={handleSearchKeyDown}
                 placeholder="Search Pokémon (Name or ID)"
                 className="border border-gray-300 rounded-md p-2 w-full"
               />
-              <button
-                className="bg-blue-600 font-bold text-white rounded-full p-2 ml-2"
-                onClick={handleSearchTrigger}
-              >
-                Search
-              </button>
             </div>
 
             {/* Filters */}
@@ -105,15 +136,15 @@ export default function FilterBox({
                   <Button
                     key={type}
                     name={type}
-                    isActive={selectedTypes.includes(type)}
-                    onClick={onTypeToggle}
+                    isActive={localSelectedTypes.has(type)}
+                    onClick={handleLocalTypeToggle}
                     colorType="type"
                   />
                 ))}
               </div>
             </div>
 
-            {/* Sorting and Display Count */}
+            {/* Sorting */}
             <div className="flex w-full gap-4">
               <div className="w-2/3">
                 <h1 className="text-2xl font-bold mb-4">Sort by</h1>
@@ -121,47 +152,42 @@ export default function FilterBox({
                   <Button
                     name="id_asc"
                     label="ID Ascending"
-                    isActive={sortBy === "id_asc"}
-                    onClick={() => onSortChange("id_asc")}
-                    colorType="sort"
-                  />
-                  <Button
-                    name="id_desc"
-                    label="ID Descending"
-                    isActive={sortBy === "id_desc"}
-                    onClick={() => onSortChange("id_desc")}
+                    isActive={localSortBy === "id_asc"}
+                    onClick={() => handleLocalSortChange("id_asc")}
                     colorType="sort"
                   />
                   <Button
                     name="name_asc"
                     label="Name A-Z"
-                    isActive={sortBy === "name_asc"}
-                    onClick={() => onSortChange("name_asc")}
+                    isActive={localSortBy === "name_asc"}
+                    onClick={() => handleLocalSortChange("name_asc")}
                     colorType="sort"
                   />
                   <Button
+                    name="id_desc"
+                    label="ID Descending"
+                    isActive={localSortBy === "id_desc"}
+                    onClick={() => handleLocalSortChange("id_desc")}
+                    colorType="sort"
+                  />
+
+                  <Button
                     name="name_desc"
                     label="Name Z-A"
-                    isActive={sortBy === "name_desc"}
-                    onClick={() => onSortChange("name_desc")}
+                    isActive={localSortBy === "name_desc"}
+                    onClick={() => handleLocalSortChange("name_desc")}
                     colorType="sort"
                   />
                 </div>
               </div>
 
-              <div>
-                <h1 className="text-2xl font-bold mb-4">Display Count</h1>
-                <input
-                  type="number"
-                  value={cardAmount}
-                  onChange={(e) => {
-                    const newValue = Number(e.target.value);
-                    setLocalDisplayCount(newValue);
-                    onCardViewAmtChange(localDisplayCount);
-                  }}
-                  className="border border-gray-300 rounded-md p-2 w-full"
-                  placeholder="Enter # of cards"
-                />
+              <div className="place-self-end">
+                <button
+                  onClick={handleApplyClick}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-7 px-4 rounded-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-lg justify-self"
+                >
+                  Apply Filters
+                </button>
               </div>
             </div>
           </div>

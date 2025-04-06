@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 import Card from "@/components/card";
 import FilterBox from "@/components/filterbox";
@@ -10,6 +10,7 @@ import {
   ApiPokemonResponse,
   PokemonCardProps,
   SortByType,
+  AppliedFilters,
 } from "@/types/types";
 
 const loadingQuotes = [
@@ -39,45 +40,59 @@ export default function Home() {
 
   // For the trigger that loads more cards
   const observerRef = useRef<HTMLDivElement | null>(null);
-  const isFilterChangeFetch = useRef(false);
+  const isFetchingRef = useRef(false);
+  const isInitialLoadRef = useRef(true);
 
   // =-=-=-=-=-= FETCHER =-=-=-=-=-=
   // Memoized callback function for fetching pokemon
   const fetchPokemon = useCallback(
-    async (isNewFilter = false) => {
+    async (applyNewFilters = false, filtersToApply?: any) => {
       // Prevent fetching if already loading OR if it's a scroll-fetch during a filter-change fetch
-      if (isLoading || (isFilterChangeFetch.current && !isNewFilter)) return;
+      if (isFetchingRef.current) {
+        console.log("FETCH BLOCKED: Already fetching.");
+        return;
+      }
 
-      // Filter change
-      if (isNewFilter) {
-        isFilterChangeFetch.current = true;
-        console.log("FETCH (New Filter/Sort): Resetting list.");
+      // Determine which filters to use for fetch
+      const currentSearchTerm = filtersToApply
+        ? filtersToApply.searchTerm
+        : searchTerm;
+      const currentSelectedTypes = filtersToApply
+        ? filtersToApply.selectedTypes
+        : selectedTypes;
+      const currentSortBy = filtersToApply ? filtersToApply.sortBy : sortBy;
+
+      let currentOffset = offset;
+      isFetchingRef.current = true;
+      setIsLoading(true);
+
+      setRandomIndex(Math.floor(Math.random() * loadingQuotes.length));
+
+      if (applyNewFilters) {
+        console.log("FETCH (Apply New Filters): Resetting list.");
         setPokemonList([]);
         setOffset(0);
+        currentOffset = 0;
         setHasMore(true);
         setError(null);
       }
 
-      setIsLoading(true);
-      const currentOffset = isNewFilter ? 0 : offset;
-      setRandomIndex(Math.floor(Math.random() * loadingQuotes.length));
-
       console.log(
-        `FETCH: Offset=${currentOffset}, Limit=${cardAmtPerBatch}, Search='${searchTerm}', Types='${selectedTypes.join(
+        `FETCH: Offset=${currentOffset}, Limit=${cardAmtPerBatch}, Search='${currentSearchTerm}', Types='${currentSelectedTypes.join(
           ","
-        )}', Sort='${sortBy}'`
+        )}', Sort='${currentSortBy}'`
       );
 
       try {
         const params = new URLSearchParams({
           limit: String(cardAmtPerBatch),
           offset: String(currentOffset),
-          sort: sortBy,
+          sort: currentSortBy,
         });
 
-        if (searchTerm) params.set("search", searchTerm);
-        if (selectedTypes.length > 0)
-          params.set("types", selectedTypes.join(","));
+        if (currentSearchTerm) params.set("search", currentSearchTerm);
+        if (currentSelectedTypes.length > 0)
+          params.set("types", currentSelectedTypes.join(","));
 
         const apiUrl = `/api/pokemon?${params.toString()}`;
         console.log("API URL:", apiUrl);
@@ -95,11 +110,14 @@ export default function Home() {
         const newPokemon = data.results;
 
         setPokemonList((prevList) =>
-          isNewFilter ? newPokemon : [...prevList, ...newPokemon]
+          applyNewFilters ? newPokemon : [...prevList, ...newPokemon]
         );
-        setOffset(currentOffset + cardAmtPerBatch);
-        setHasMore(data.next !== null);
-        setTotalCount(data.count);
+        const nextOffset = currentOffset + newPokemon.length;
+        setOffset(nextOffset);
+        setHasMore(data.next !== null && newPokemon.length > 0);
+        if (applyNewFilters || totalCount === 0) {
+          setTotalCount(data.count);
+        }
         setError(null);
       } catch (e: any) {
         console.error("Failed to fetch Pokemon: ", e);
@@ -107,60 +125,49 @@ export default function Home() {
           `Failed to load Pokemon: ${e.message}. Please try refreshing or adjusting filters`
         );
         setHasMore(false);
+        if (applyNewFilters) setPokemonList([]);
       } finally {
         setIsLoading(false);
-        if (isNewFilter) {
-          isFilterChangeFetch.current = false; // Reset flag
-        }
+        isFetchingRef.current = false;
         console.log("Fetch cycle complete.");
       }
     },
-    [isLoading, hasMore, offset, searchTerm, selectedTypes, sortBy]
+    [cardAmtPerBatch, offset, searchTerm, selectedTypes, sortBy, totalCount]
   );
 
   // =-=-=-=-=-= HANDLERS =-=-=-=-=-=
-  useEffect(() => {
-    // Fetch when searchTerm, selectedTypes, or sortBy changes.
-    // The 'true' argument signifies this is a fetch due to new filters.
-    console.log("Filter/Sort changed. Triggering refetch.");
-    fetchPokemon(true);
-  }, [searchTerm, selectedTypes, sortBy, cardAmtPerBatch]);
+  const handleApplyFilters = useCallback(
+    (appliedFilters: AppliedFilters) => {
+      console.log("Applying filters received from FilterBox:", appliedFilters);
 
-  // Filters and Sort to be passed to FilterBox
-  const handleSearchChange = useCallback((term: string) => {
-    setSearchTerm(term);
-  }, []);
+      setSearchTerm(appliedFilters.searchTerm);
+      setSelectedTypes(appliedFilters.selectedTypes);
+      setSortBy(appliedFilters.sortBy);
 
-  const handleTypeToggle = useCallback((type: string) => {
-    setSelectedTypes((prevTypes) =>
-      prevTypes.includes(type)
-        ? prevTypes.filter((t) => t !== type)
-        : [...prevTypes, type]
-    );
-  }, []);
-
-  const handleSortChange = useCallback((sortKey: SortByType) => {
-    setSortBy(sortKey);
-  }, []);
-
-  const handleCardViewAmt = useCallback((amount: number) => {
-    setCardAmtPerBatch(amount);
-  }, []);
+      fetchPokemon(true, appliedFilters);
+    },
+    [fetchPokemon]
+  );
 
   // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
+  useEffect(() => {
+    // Only fetch on initial mount
+    if (isInitialLoadRef.current) {
+      console.log("Initial load fetch triggered.");
+      fetchPokemon(true); // Fetch with initial state filters (empty/defaults)
+      isInitialLoadRef.current = false; // Mark initial load as done
+    }
+  }, [fetchPokemon]);
+
   // Effect for infinite load (Scroll)
   useEffect(() => {
     // Don't observe if loading, no more data, or if a filter change fetch is in progress
-    if (isLoading || !hasMore || isFilterChangeFetch.current) return;
+    if (isLoading || !hasMore || pokemonList.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         // Check intersection and ensure it's not during a filter change
-        if (
-          entries[0].isIntersecting &&
-          !isLoading &&
-          !isFilterChangeFetch.current
-        ) {
+        if (entries[0].isIntersecting && !isLoading && !isFetchingRef.current) {
           console.log("Observer triggered fetch (scroll)");
           fetchPokemon(false); // 'false' indicates a scroll fetch, not new filters
         }
@@ -178,21 +185,17 @@ export default function Home() {
         observer.unobserve(currentObserverRef);
       }
     };
-  }, [fetchPokemon, hasMore, isLoading]);
+  }, [fetchPokemon, hasMore, isLoading, pokemonList]);
 
   return (
     <div className="font-mono relative">
       <div className=" mx-auto mt-12 flex flex-col md:flex-row justify-center">
         {/* Filter Box */}
         <FilterBox
-          searchTerm={searchTerm}
-          selectedTypes={selectedTypes}
-          sortBy={sortBy}
-          onSearchChange={handleSearchChange}
-          onTypeToggle={handleTypeToggle}
-          onSortChange={handleSortChange}
-          cardAmount={cardAmtPerBatch}
-          onCardViewAmtChange={handleCardViewAmt}
+          initialSearchTerm={searchTerm}
+          initialSelectedTypes={selectedTypes}
+          initialSortBy={sortBy}
+          onApply={handleApplyFilters}
         />
 
         {/* Main Card List */}

@@ -183,14 +183,11 @@ export interface AppliedFilters {
   searchTerm: string;
   selectedTypes: string[];
   sortBy: SortByType;
-  displayCount: number;
 }
 
 export interface FilterBoxProps {
   initialSearchTerm: string;
   initialSelectedTypes: string[];
   initialSortBy: SortByType;
-  initialDisplayCount: number;
-
   onApply: (appliedFilters: AppliedFilters) => void;
 }
