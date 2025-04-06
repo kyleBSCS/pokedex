@@ -1,5 +1,26 @@
 import Button from "./button";
 
+const POKEMON_TYPES = [
+  "grass",
+  "fire",
+  "water",
+  "electric",
+  "psychic",
+  "dark",
+  "fairy",
+  "steel",
+  "dragon",
+  "ghost",
+  "bug",
+  "rock",
+  "ground",
+  "poison",
+  "flying",
+  "normal",
+  "ice",
+  "fighting",
+];
+
 export default function FilterBox() {
   // Define the polygon string directly for the clip-path style
   const clipPathStyle = `polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px))`;
@@ -55,21 +76,15 @@ export default function FilterBox() {
             <div className="mb-4">
               <h1 className="text-2xl font-bold mb-4">Filter by</h1>
               <div className="grid grid-cols-3 gap-1">
-                <Button name="Grass" />
-                <Button name="Fire" />
-                <Button name="Water" />
-                <Button name="Electric" />
-                <Button name="Psychic" />
-                <Button name="Dark" />
-                <Button name="Fairy" />
-                <Button name="Steel" />
-                <Button name="Dragon" />
-                <Button name="Ghost" />
-                <Button name="Bug" />
-                <Button name="Rock" />
-                <Button name="Ground" />
-                <Button name="Poison" />
-                <Button name="Flying" />
+                {POKEMON_TYPES.map((type) => (
+                  <Button
+                    key={type}
+                    name={type}
+                    isActive={selectedTypes.includes(type)}
+                    onClick={onTypeToggle}
+                    colorType="type"
+                  />
+                ))}
               </div>
             </div>
 

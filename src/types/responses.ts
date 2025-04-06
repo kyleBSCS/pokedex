@@ -36,3 +36,11 @@ export interface PokemonCardProps {
   imageUrl: string;
   types: string[];
 }
+
+export interface ButtonProps {
+  name: string;
+  label?: string;
+  isActive: boolean;
+  onClick: (name: string) => void;
+  colorType?: "type" | "sort" | "default";
+}
