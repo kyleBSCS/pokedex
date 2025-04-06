@@ -74,7 +74,7 @@ export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
   return (
     <motion.div
       ref={cardRef}
-      className="bg-white w-[250px] h-[400px] rounded-xl flex-col border-black border-2 items-center justify-center cursor-pointer overflow-hidden"
+      className="bg-white w-[240px] h-[400px] rounded-xl flex-col border-black border-2 items-center justify-center cursor-pointer overflow-hidden"
       variants={cardVariants}
       initial="initial"
       animate={getTargetAnimation()}
@@ -103,8 +103,8 @@ export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
         <Image
           draggable="false"
           src={imageError ? "/fallback.webp" : imageUrl}
-          width={300}
-          height={300}
+          width={240}
+          height={240}
           alt={name}
           onError={() => setImageError(true)}
           priority={id <= 20}
@@ -113,7 +113,7 @@ export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
       </div>
 
       {/* Types and Name */}
-      <div className="font-mono pl-4 mt-1">
+      <div className="font-mono pl-4 mt-4">
         <div className="flex gap-1">
           {/* Types */}
           {types.map((type) => (
