@@ -53,3 +53,39 @@ async function getFullPokemonList(): Promise<PokeApiResource[]> {
     return fullPokemonListCache || [];
   }
 }
+
+async function getPokemonByTypes(types: string[]): Promise<PokeApiResource[]> {
+  console.log(`Fetching Pokemon for types: ${types.join(", ")}`);
+  const typePromises = types.map(async (type) => {
+    try {
+      const res = await fetch(`${BASE_URL}/type/${type.toLowerCase()}`);
+
+      if (!res.ok) {
+        console.warn(`Failed to fetch type ${type}: ${res.statusText}`);
+        return [];
+      }
+
+      const data: PokeApiTypeResponse = await res.json();
+      return data.pokemon.map((p) => p.pokemon);
+    } catch (e) {
+      console.error(`Error fetching type ${type}:`, e);
+      return [];
+    }
+  });
+
+  const resultsPerType = await Promise.all(typePromises);
+
+  // Combine results and remove duplicates
+  const combinedMap = new Map<string, PokeApiResource>();
+  resultsPerType.flat().forEach((pokemon) => {
+    if (!combinedMap.has(pokemon.name)) {
+      combinedMap.set(pokemon.name, pokemon);
+    }
+  });
+
+  const uniquePokemon = Array.from(combinedMap.values());
+  console.log(
+    `Found ${uniquePokemon.length} unique Pokemon across specified types.`
+  );
+  return uniquePokemon;
+}
