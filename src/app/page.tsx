@@ -20,6 +20,15 @@ import {
 // I increased this from 10 to 30 due to animation bugs when the screen is large enough that it can view more than 10 cards at once
 const POKE_LIMIT = 30;
 
+const loadingQuotes = [
+  "Fetching data... it's super effective!",
+  "Your content is evolving!",
+  "This might take a Potion or two...",
+  "Snorlax is in the way...",
+  "Passing by tall grass...",
+  "Trying to avoid wild encounters...",
+];
+
 export default function Home() {
   const [pokemonList, setPokemonList] = useState<PokemonCardProps[]>([]);
   const [offset, setOffset] = useState(0);
@@ -30,6 +39,7 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortByType>("id_asc");
+  const [randomIndex, setRandomIndex] = useState(0);
 
   // For the trigger that loads more cards
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -54,6 +64,7 @@ export default function Home() {
 
       setIsLoading(true);
       const currentOffset = isNewFilter ? 0 : offset;
+      setRandomIndex(Math.floor(Math.random() * loadingQuotes.length));
 
       console.log(
         `FETCH: Offset=${currentOffset}, Limit=${POKE_LIMIT}, Search='${searchTerm}', Types='${selectedTypes.join(
@@ -231,17 +242,23 @@ export default function Home() {
         className="h-20 flex justify-center items-center w-full text-center"
       >
         {isLoading && (
-          <p className="animate-pulse text-white font-bold text-2xl">
-            Loading more Pokemon...
-          </p>
+          <div className="flex gap-2 items-center justify-center">
+            <Image
+              src="/loading.png"
+              alt="Loading icon"
+              width={40}
+              height={40}
+              className="animate-spin"
+            />
+            <p className="animate-pulse text-white font-bold text-2xl">
+              {loadingQuotes[randomIndex]}
+            </p>
+          </div>
         )}
         {!isLoading && !hasMore && pokemonList.length > 0 && (
-          <p className="text-gray-500">-- End of List --</p>
+          <p className="text-white font-bold text-2xl">-- End of List --</p>
         )}
-        {error && <p className="text-gray-600 font-semibold p-4">{error}</p>}
-        {!isLoading && hasMore && pokemonList.length === 0 && !error && (
-          <p className="texxt-gray-400">Scroll down to load more Pokemon!</p>
-        )}
+        {error && <p className="text-white font-semibold p-4">{error}</p>}
       </div>
 
       {/* <Details /> */}

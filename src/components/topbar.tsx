@@ -6,7 +6,7 @@ export default function TopBar() {
 
   return (
     <div
-      className="w-5/6 h-16 bg-white sticky top-0 border-b-2 border-r-2 border-black z-10"
+      className="w-5/6 h-16 bg-white sticky top-0 border-b-2 border-r-2 border-black z-10 "
       style={{ clipPath: clipPathStyle }}
     >
       <div className="flex items-center justify-between h-full pl-12">
