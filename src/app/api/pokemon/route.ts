@@ -1,16 +1,28 @@
 import { NextResponse, NextRequest } from "next/server";
 import { SortByType } from "@/types/responses";
-
-const BASE_URL = "https://pokeapi.co/api/v2";
+import { getPokemon } from "@/app/services/pokemon.service";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
 
-  const limit = searchParams.get("limit") ?? "30";
-  const offset = searchParams.get("offset") ?? "0";
+  const limit = parseInt(searchParams.get("limit") ?? "30");
+  const offset = parseInt(searchParams.get("offset") ?? "0");
   const search = searchParams.get("search") ?? undefined;
-  const typesParam = searchParams.get("types");
+  const typesParam = searchParams.get("types"); // Comma-separated
   const sort = (searchParams.get("sort") as SortByType) ?? "id_asc";
+
+  if (isNaN(limit) || limit <= 0) {
+    return NextResponse.json(
+      { message: "Invalid 'limit' parameter." },
+      { status: 400 }
+    );
+  }
+  if (isNaN(offset) || offset < 0) {
+    return NextResponse.json(
+      { message: "Invalid 'offset' parameter." },
+      { status: 400 }
+    );
+  }
 
   // Parse types string into array
   const types = typesParam
@@ -21,26 +33,36 @@ export async function GET(request: NextRequest) {
     : undefined;
 
   try {
-    const apiUrl = `${BASE_URL}/pokemon?limit=${limit}&offset=${offset}`;
-    const response = await fetch(apiUrl);
+    const results = await getPokemon({
+      limit,
+      offset,
+      search,
+      types,
+      sort,
+    });
 
-    // Check if it returns an erraor
-    if (!response.ok) {
-      console.error(`PokeAPI Error: ${response.status} ${response.statusText}`);
-      return NextResponse.json(
-        {
-          message: `Failed to fetch from PokeAPI: ${response.statusText}`,
-        },
-        { status: response.status }
-      );
-    }
+    const responseData = {
+      count: results.totalCount,
+      next:
+        offset + limit < results.totalCount
+          ? `api/pokemon?limit=${limit}&offset=${offset + limit}${
+              search ? `&search=${search}` : ""
+            }${typesParam ? `&types=${typesParam}` : ""}&sort=${sort}`
+          : null,
+      previous:
+        offset > 0
+          ? `/api/pokemon?limit=${limit}&offset=${Math.max(0, offset - limit)}${
+              search ? `&search=${search}` : ""
+            }${typesParam ? `&types=${typesParam}` : ""}&sort=${sort}`
+          : null,
+      results: results.pokemon,
+    };
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (e) {
-    console.error(`Error fetching Pokemon list`, e);
+    return NextResponse.json(responseData);
+  } catch (e: any) {
+    console.error(`Error in /api/pokemon route:`, e);
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { message: e.message || "Internal Server Error fetching Pokemon list" },
       { status: 500 }
     );
   }
