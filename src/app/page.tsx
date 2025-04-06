@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-
-import Card from "@/components/card";
-import FilterBox from "@/components/filterbox";
-import Image from "next/image";
 import * as motion from "motion/react-client";
+import Image from "next/image";
+
 import {
   ApiPokemonResponse,
   PokemonCardProps,
   SortByType,
   AppliedFilters,
 } from "@/types/types";
+import Card from "@/components/card";
+import FilterBox from "@/components/filterbox";
 
 const loadingQuotes = [
   "Fetching data... it's super effective!",
@@ -22,21 +22,23 @@ const loadingQuotes = [
   "Trying to avoid wild encounters...",
 ];
 
+// Limits how many pokemon cards to fetch per batch
+/* 
+    I increased this from 10 to 30 due to animation bugs when
+    the screen is large enough that it can view more than 10 cards at once 
+*/
+const MAX_CARD_PER_BATCH = 30;
+
 export default function Home() {
   const [pokemonList, setPokemonList] = useState<PokemonCardProps[]>([]);
-  const [offset, setOffset] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [totalCount, setTotalCount] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortByType>("id_asc");
+  const [error, setError] = useState<string | null>(null);
   const [randomIndex, setRandomIndex] = useState(0);
-
-  // Limits how many pokemon cards to fetch per batch
-  // I increased this from 10 to 30 due to animation bugs when the screen is large enough that it can view more than 10 cards at once
-  const [cardAmtPerBatch, setCardAmtPerBatch] = useState(30);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(0);
 
   // For the trigger that loads more cards
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -47,13 +49,14 @@ export default function Home() {
   // Memoized callback function for fetching pokemon
   const fetchPokemon = useCallback(
     async (applyNewFilters = false, filtersToApply?: any) => {
-      // Prevent fetching if already loading OR if it's a scroll-fetch during a filter-change fetch
+      // Prevent repetitive fetching
       if (isFetchingRef.current) {
         console.log("FETCH BLOCKED: Already fetching.");
         return;
       }
 
       // Determine which filters to use for fetch
+      // Necessary due to race conditions
       const currentSearchTerm = filtersToApply
         ? filtersToApply.searchTerm
         : searchTerm;
@@ -66,37 +69,35 @@ export default function Home() {
       isFetchingRef.current = true;
       setIsLoading(true);
 
+      // For random loading quotes
       setRandomIndex(Math.floor(Math.random() * loadingQuotes.length));
 
       if (applyNewFilters) {
         console.log("FETCH (Apply New Filters): Resetting list.");
+
         setPokemonList([]);
-        setOffset(0);
         currentOffset = 0;
-        setHasMore(true);
+        setOffset(0);
+        setHasMore(true); // Assume true
         setError(null);
       }
 
-      console.log(
-        `FETCH: Offset=${currentOffset}, Limit=${cardAmtPerBatch}, Search='${currentSearchTerm}', Types='${currentSelectedTypes.join(
-          ","
-        )}', Sort='${currentSortBy}'`
-      );
-
       try {
+        // Set up the API url
         const params = new URLSearchParams({
-          limit: String(cardAmtPerBatch),
+          limit: String(MAX_CARD_PER_BATCH),
           offset: String(currentOffset),
           sort: currentSortBy,
         });
-
         if (currentSearchTerm) params.set("search", currentSearchTerm);
         if (currentSelectedTypes.length > 0)
           params.set("types", currentSelectedTypes.join(","));
 
+        // Construct the URL based on params
         const apiUrl = `/api/pokemon?${params.toString()}`;
         console.log("API URL:", apiUrl);
 
+        // Fetch from own API
         const res = await fetch(apiUrl);
 
         if (!res.ok) {
@@ -115,11 +116,9 @@ export default function Home() {
         const nextOffset = currentOffset + newPokemon.length;
         setOffset(nextOffset);
         setHasMore(data.next !== null && newPokemon.length > 0);
-        if (applyNewFilters || totalCount === 0) {
-          setTotalCount(data.count);
-        }
         setError(null);
       } catch (e: any) {
+        // Catch any errors during fetch
         console.error("Failed to fetch Pokemon: ", e);
         setError(
           `Failed to load Pokemon: ${e.message}. Please try refreshing or adjusting filters`
@@ -127,41 +126,35 @@ export default function Home() {
         setHasMore(false);
         if (applyNewFilters) setPokemonList([]);
       } finally {
+        // Set flags to false
         setIsLoading(false);
         isFetchingRef.current = false;
         console.log("Fetch cycle complete.");
       }
     },
-    [cardAmtPerBatch, offset, searchTerm, selectedTypes, sortBy, totalCount]
+    [offset, searchTerm, selectedTypes, sortBy]
   );
 
-  // =-=-=-=-=-= HANDLERS =-=-=-=-=-=
+  // =-=-=-=-=-= HANDLER =-=-=-=-=-=
   const handleApplyFilters = useCallback(
     (appliedFilters: AppliedFilters) => {
-      console.log("Applying filters received from FilterBox:", appliedFilters);
-
       setSearchTerm(appliedFilters.searchTerm);
       setSelectedTypes(appliedFilters.selectedTypes);
       setSortBy(appliedFilters.sortBy);
-
       fetchPokemon(true, appliedFilters);
     },
     [fetchPokemon]
   );
 
   // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
+  // Initial load
   useEffect(() => {
-    // Only fetch on initial mount
-    if (isInitialLoadRef.current) {
-      console.log("Initial load fetch triggered.");
-      fetchPokemon(true); // Fetch with initial state filters (empty/defaults)
-      isInitialLoadRef.current = false; // Mark initial load as done
-    }
-  }, [fetchPokemon]);
+    fetchPokemon(true);
+  }, []);
 
   // Effect for infinite load (Scroll)
   useEffect(() => {
-    // Don't observe if loading, no more data, or if a filter change fetch is in progress
+    // Don't observe if loading, no more data, or if list is 0
     if (isLoading || !hasMore || pokemonList.length === 0) return;
 
     const observer = new IntersectionObserver(
@@ -175,11 +168,13 @@ export default function Home() {
       { threshold: 0.1 } // Trigger when 10% is visible
     );
 
+    // Mount
     const currentObserverRef = observerRef.current;
     if (currentObserverRef) {
       observer.observe(currentObserverRef);
     }
 
+    // Unmount
     return () => {
       if (currentObserverRef) {
         observer.unobserve(currentObserverRef);
@@ -220,7 +215,7 @@ export default function Home() {
               transition={{
                 duration: 0.3,
                 ease: "easeOut",
-                delay: (index % cardAmtPerBatch) * 0.05, // Staggered delay for each card
+                delay: (index % MAX_CARD_PER_BATCH) * 0.05, // Staggered delay for each card
               }}
             >
               <Card
