@@ -1,25 +1,5 @@
 import Button from "./button";
-
-const POKEMON_TYPES = [
-  "grass",
-  "fire",
-  "water",
-  "electric",
-  "psychic",
-  "dark",
-  "fairy",
-  "steel",
-  "dragon",
-  "ghost",
-  "bug",
-  "rock",
-  "ground",
-  "poison",
-  "flying",
-  "normal",
-  "ice",
-  "fighting",
-];
+import { POKEMON_TYPES } from "@/types/responses";
 
 export default function FilterBox() {
   // Define the polygon string directly for the clip-path style

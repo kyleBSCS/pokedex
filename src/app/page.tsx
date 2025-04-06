@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 
 import Card from "@/components/card";
 import FilterBox from "@/components/filterbox";
@@ -12,6 +12,7 @@ import {
   PokemonDetail,
   PokemonListResponse,
   PokemonCardProps,
+  SortByType,
 } from "@/types/responses";
 
 // Limits how many pokemon cards to fetch per batch
@@ -19,11 +20,16 @@ import {
 const POKE_LIMIT = 30;
 
 export default function Home() {
-  const [cards, setCards] = useState<PokemonCardProps[]>([]);
+  const [allFetchedPokemon, setAllFetchedPokemon] = useState<
+    PokemonCardProps[]
+  >([]);
   const [offset, setOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<SortByType>("id_asc");
 
   // For the trigger that loads more cards
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -84,7 +90,14 @@ export default function Home() {
         }));
 
       // STEP 4: Update states
-      setCards((prevList) => [...prevList, ...newPokemon]);
+      setAllFetchedPokemon((prevList) => {
+        // Avoid duplicates
+        const existingIds = new Set(prevList.map((p) => p.id));
+        const uniqueNewPokemon = newPokemon.filter(
+          (p) => !existingIds.has(p.id)
+        );
+        return [...prevList, ...uniqueNewPokemon];
+      });
       setOffset((prevOffset) => prevOffset + POKE_LIMIT);
       setHasMore(listData.next !== null); // Check if there's a next page URL
     } catch (fetchError: any) {
@@ -96,15 +109,20 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, hasMore, offset, error]);
+  }, [isLoading, hasMore, offset, error, allFetchedPokemon.length]);
+
+  // Filters and Sort to be passed to FilterBox
+  const handleSearchChange = useCallback((term: string) => {
+    setSearchTerm(term);
+  }, []);
 
   // Effect for initial load
   useEffect(() => {
-    if (cards.length === 0 && !error) {
+    if (allFetchedPokemon.length === 0 && !error && !isLoading) {
       console.log("Initial load: Fetching first batch...");
       fetchPokemon();
     }
-  });
+  }, [allFetchedPokemon.length, error, isLoading, fetchPokemon]);
 
   // Effect for setting up infinite load
   useEffect(() => {

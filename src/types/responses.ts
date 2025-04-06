@@ -44,3 +44,34 @@ export interface ButtonProps {
   onClick: (name: string) => void;
   colorType?: "type" | "sort" | "default";
 }
+
+export interface FilterBoxProps {
+  searchTerm: string;
+  selectedTypes: string[];
+  sortBy: SortByType;
+  onSearchChange: (term: string) => void;
+  onTypeToggle: (type: string) => void;
+  onSortChange: (sortKey: SortByType) => void;
+}
+
+export type SortByType = "id_asc" | "id_desc" | "name_asc" | "name_desc";
+export const POKEMON_TYPES = [
+  "grass",
+  "fire",
+  "water",
+  "electric",
+  "psychic",
+  "dark",
+  "fairy",
+  "steel",
+  "dragon",
+  "ghost",
+  "bug",
+  "rock",
+  "ground",
+  "poison",
+  "flying",
+  "normal",
+  "ice",
+  "fighting",
+];
