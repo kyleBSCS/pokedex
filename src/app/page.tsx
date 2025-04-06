@@ -124,6 +124,35 @@ export default function Home() {
     }
   }, [isLoading, hasMore, offset, error]);
 
+  // Effect for initial load
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          console.log("Observer triggered, fetching more...");
+          fetchPokemon();
+        }
+      },
+      {
+        rootMargin: "0px",
+        threshold: 1.0, // Trigger only when the element is fully visible
+      }
+    );
+
+    const currentObserverRef = observerRef.current; // Capture ref value
+
+    if (currentObserverRef) {
+      observer.observe(currentObserverRef);
+    }
+
+    // Cleanup
+    return () => {
+      if (currentObserverRef) {
+        observer.unobserve(currentObserverRef);
+      }
+    };
+  }, [fetchPokemon, hasMore, isLoading]);
+
   return (
     <div className="font-mono relative">
       <div className=" mx-auto mt-12 flex flex-col md:flex-row justify-center">
