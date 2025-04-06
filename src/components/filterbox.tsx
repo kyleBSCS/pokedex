@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Button from "./button";
 import { POKEMON_TYPES } from "@/types/responses";
 import { FilterBoxProps } from "@/types/responses";
@@ -10,6 +13,31 @@ export default function FilterBox({
   onTypeToggle,
   onSortChange,
 }: FilterBoxProps) {
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+
+  useEffect(() => {
+    setLocalSearchTerm(searchTerm);
+  }, [searchTerm]);
+
+  // Update local state as user types
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalSearchTerm(event.target.value);
+  };
+
+  // Trigger the actual search (call parent function)
+  const handleSearchTrigger = () => {
+    // Pass the current value from the local state to the parent
+    onSearchChange(localSearchTerm);
+  };
+
+  // Handle Enter key press in the input field
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSearchTrigger();
+    }
+  };
+
   // Define the polygon string directly for the clip-path style
   const clipPathStyle = `polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px))`;
 
@@ -52,10 +80,16 @@ export default function FilterBox({
             <div className="flex items-center mb-4">
               <input
                 type="text"
-                placeholder="Search Pokémon (Name, ID, Ability)"
+                value={localSearchTerm}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Search Pokémon (Name or ID)"
                 className="border border-gray-300 rounded-md p-2 w-full"
               />
-              <button className="bg-blue-600 font-bold text-white rounded-full p-2 ml-2">
+              <button
+                className="bg-blue-600 font-bold text-white rounded-full p-2 ml-2"
+                onClick={handleSearchTrigger}
+              >
                 Search
               </button>
             </div>
