@@ -39,7 +39,7 @@ export default function Home() {
     try {
       // STEP 1: Fetch list of Pokemon names and detail URLs
       const listResponse = await fetch(
-        `api/pokemon?limit=${POKE_LIMIT}&offset=${offset}`
+        `/api/pokemon?limit=${POKE_LIMIT}&offset=${offset}`
       );
       if (!listResponse.ok) {
         throw new Error(`API List Error: ${listResponse.statusText}`);
@@ -99,6 +99,14 @@ export default function Home() {
 
   // Effect for initial load
   useEffect(() => {
+    if (cards.length === 0 && !error) {
+      console.log("Initial load: Fetching first batch...");
+      fetchPokemon();
+    }
+  });
+
+  // Effect for setting up infinite load
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isLoading) {
@@ -108,7 +116,7 @@ export default function Home() {
       },
       {
         rootMargin: "0px",
-        threshold: 1.0, // Trigger only when the element is fully visible
+        threshold: 0.1, // Trigger when 10% visible
       }
     );
 
@@ -167,6 +175,26 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      {/* Status Messages */}
+      <div
+        ref={observerRef}
+        className="h-20 flex justify-center items-center w-full text-center"
+      >
+        {isLoading && (
+          <p className="animate-pulse text-white font-bold text-2xl">
+            Loading more Pokemon...
+          </p>
+        )}
+        {!isLoading && !hasMore && cards.length > 0 && (
+          <p className="text-gray-500">-- End of List --</p>
+        )}
+        {error && <p className="text-gray-600 font-semibold p-4">{error}</p>}
+        {!isLoading && hasMore && cards.length === 0 && !error && (
+          <p className="texxt-gray-400">Scroll down to load more Pokemon!</p>
+        )}
+      </div>
+
       {/* <Details /> */}
 
       {/* Background Image */}
