@@ -95,7 +95,7 @@ export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
       <div className="relative w-full flex justify-center items-center ">
         {/* Background Rectangle */}
         <div
-          className="absolute w-[205px] h-[205px rounded-4xl"
+          className="absolute w-[205px] h-[205px] rounded-full"
           style={{ backgroundColor: cardBgColor }}
         ></div>
 
@@ -119,14 +119,16 @@ export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
           {types.map((type) => (
             <span
               key={type}
-              className={`font-semibold text-xs text-white px-2.5 py-0.5 rounded-full shadow capitalize`}
+              className={`font-semibold text-xs text-white px-2.5 py-0.5 rounded-full shadow capitalize border-1 border-black`}
               style={{ backgroundColor: getBGColorForType(type) }}
             >
               {type}
             </span>
           ))}
         </div>
-        <h1 className="text-3xl font-bold mt-1">{name}</h1>
+        <h1 className="text-3xl font-bold mt-1">
+          {name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()}
+        </h1>
       </div>
     </motion.div>
   );

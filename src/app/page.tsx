@@ -15,7 +15,8 @@ import {
 } from "@/types/responses";
 
 // Limits how many pokemon cards to fetch per batch
-const POKE_LIMIT = 20;
+// I increased this from 10 to 30 due to animation bugs when the screen is large enough that it can view more than 10 cards at once
+const POKE_LIMIT = 30;
 
 export default function Home() {
   const [cards, setCards] = useState<PokemonCardProps[]>([]);
