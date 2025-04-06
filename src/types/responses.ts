@@ -23,11 +23,25 @@ export interface PokemonDetail {
 }
 
 // Structure of the JSON for the list of pokemon
-export interface PokemonListResponse {
+export interface PokeApiResource {
+  name: string;
+  url: string;
+}
+
+export interface PokeApiPokemonListResponse {
   count: number;
   next: string | null;
   previous: string | null;
   results: Array<{ name: string; url: string }>;
+}
+
+export interface PokeApiTypeResponse {
+  id: number;
+  name: string;
+  pokemon: Array<{
+    slot: number;
+    pokemon: PokeApiResource;
+  }>;
 }
 
 export interface PokemonCardProps {

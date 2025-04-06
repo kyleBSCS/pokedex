@@ -1,11 +1,24 @@
 import { NextResponse, NextRequest } from "next/server";
+import { SortByType } from "@/types/responses";
 
 const BASE_URL = "https://pokeapi.co/api/v2";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const limit = searchParams.get("limit") ?? "20";
+
+  const limit = searchParams.get("limit") ?? "30";
   const offset = searchParams.get("offset") ?? "0";
+  const search = searchParams.get("search") ?? undefined;
+  const typesParam = searchParams.get("types");
+  const sort = (searchParams.get("sort") as SortByType) ?? "id_asc";
+
+  // Parse types string into array
+  const types = typesParam
+    ? typesParam
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : undefined;
 
   try {
     const apiUrl = `${BASE_URL}/pokemon?limit=${limit}&offset=${offset}`;

@@ -10,7 +10,7 @@ import Details from "@/components/details";
 import { formatPokemonId } from "@/utils/helper";
 import {
   PokemonDetail,
-  PokemonListResponse,
+  PokeApiPokemonListResponse,
   PokemonCardProps,
   SortByType,
 } from "@/types/responses";
