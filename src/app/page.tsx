@@ -11,6 +11,7 @@ import { formatPokemonId } from "@/utils/helper";
 import {
   PokemonDetail,
   PokeApiPokemonListResponse,
+  ApiPokemonResponse,
   PokemonCardProps,
   SortByType,
 } from "@/types/responses";
@@ -20,97 +21,102 @@ import {
 const POKE_LIMIT = 30;
 
 export default function Home() {
-  const [allFetchedPokemon, setAllFetchedPokemon] = useState<
-    PokemonCardProps[]
-  >([]);
+  const [pokemonList, setPokemonList] = useState<PokemonCardProps[]>([]);
   const [offset, setOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortByType>("id_asc");
 
   // For the trigger that loads more cards
   const observerRef = useRef<HTMLDivElement | null>(null);
+  const isFilterChangeFetch = useRef(false);
 
   // =-=-=-=-=-= FETCHER =-=-=-=-=-=
   // Memoized callback function for fetching pokemon
-  const fetchPokemon = useCallback(async () => {
-    // Prevent fetching if already loading, no more data, or an error occured
-    if (isLoading || !hasMore || error) return;
+  const fetchPokemon = useCallback(
+    async (isNewFilter = false) => {
+      // Prevent fetching if already loading OR if it's a scroll-fetch during a filter-change fetch
+      if (isLoading || (isFilterChangeFetch.current && !isNewFilter)) return;
 
-    setIsLoading(true);
-    setError(null);
-    console.log(`Fetching Pokemon: limit=${POKE_LIMIT}, offset=${offset}`);
-
-    try {
-      // STEP 1: Fetch list of Pokemon names and detail URLs
-      const listResponse = await fetch(
-        `/api/pokemon?limit=${POKE_LIMIT}&offset=${offset}`
-      );
-      if (!listResponse.ok) {
-        throw new Error(`API List Error: ${listResponse.statusText}`);
+      // Filter change
+      if (isNewFilter) {
+        isFilterChangeFetch.current = true;
+        console.log("FETCH (New Filter/Sort): Resetting list.");
+        setPokemonList([]);
+        setOffset(0);
+        setHasMore(true);
+        setError(null);
       }
-      const listData: PokemonListResponse = await listResponse.json();
 
-      // STEP 3: Fetch details for each Pokemon in the list concurrently
-      const detailPromises = listData.results.map(async (pokemon) => {
-        try {
-          // Use the direct PokeAPI URL for details
-          const detailRes = await fetch(pokemon.url);
-          if (!detailRes.ok) {
-            console.warn(
-              `Failed to fetch details for ${pokemon.name}: ${detailRes.statusText}`
-            );
-            return null; // Skip this Pokemon if details fail
-          }
-          return (await detailRes.json()) as PokemonDetail;
-        } catch (detailError) {
-          console.error(
-            `Error fetching details for ${pokemon.name}:`,
-            detailError
-          );
-          return null; // Skip on error
-        }
-      });
+      setIsLoading(true);
+      const currentOffset = isNewFilter ? 0 : offset;
 
-      const detailedResults = await Promise.all(detailPromises);
-
-      // STEP 3: Filter out null results and format data for the cards
-      const newPokemon = detailedResults
-        .filter((detail): detail is PokemonDetail => detail !== null)
-        .map((detail) => ({
-          id: detail.id,
-          name: detail.name,
-          // TODO: Add fallback image
-          imageUrl:
-            detail.sprites.other?.["official-artwork"]?.front_default ??
-            "/fallback.webp",
-          types: detail.types.map((typeInfo) => typeInfo.type.name),
-        }));
-
-      // STEP 4: Update states
-      setAllFetchedPokemon((prevList) => {
-        // Avoid duplicates
-        const existingIds = new Set(prevList.map((p) => p.id));
-        const uniqueNewPokemon = newPokemon.filter(
-          (p) => !existingIds.has(p.id)
-        );
-        return [...prevList, ...uniqueNewPokemon];
-      });
-      setOffset((prevOffset) => prevOffset + POKE_LIMIT);
-      setHasMore(listData.next !== null); // Check if there's a next page URL
-    } catch (fetchError: any) {
-      console.error("Failed to fetch Pokemon:", fetchError);
-      setError(
-        `Failed to load Pokemon: ${fetchError.message}. Please try refreshing.`
+      console.log(
+        `FETCH: Offset=${currentOffset}, Limit=${POKE_LIMIT}, Search='${searchTerm}', Types='${selectedTypes.join(
+          ","
+        )}', Sort='${sortBy}'`
       );
-      setHasMore(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isLoading, hasMore, offset, error, allFetchedPokemon.length]);
+
+      try {
+        const params = new URLSearchParams({
+          limit: String(POKE_LIMIT),
+          offset: String(currentOffset),
+          sort: sortBy,
+        });
+
+        if (searchTerm) params.set("search", searchTerm);
+        if (selectedTypes.length > 0)
+          params.set("types", selectedTypes.join(","));
+
+        const apiUrl = `/api/pokemon?${params.toString()}`;
+        console.log("API URL:", apiUrl);
+
+        const res = await fetch(apiUrl);
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.message || `API Error: ${res.statusText}`);
+        }
+
+        const data: ApiPokemonResponse = await res.json();
+        console.log("API Response Data: ", data);
+
+        // Filter out dupes
+        const newPokemon = data.results;
+        const currentIds = new Set(
+          isNewFilter ? [] : pokemonList.map((p) => p.id)
+        );
+        const uniqueNewPokemon = newPokemon.filter(
+          (p) => !currentIds.has(p.id)
+        );
+
+        setPokemonList((prevList) =>
+          isNewFilter ? uniqueNewPokemon : [...prevList, ...uniqueNewPokemon]
+        );
+        setOffset(currentOffset + POKE_LIMIT);
+        setHasMore(data.next !== null);
+        setTotalCount(data.count);
+        setError(null);
+      } catch (e: any) {
+        console.error("Failed to fetch Pokemon: ", e);
+        setError(
+          `Failed to load Pokemon: ${e.message}. Please try refreshing or adjusting filters`
+        );
+        setHasMore(false);
+      } finally {
+        setIsLoading(false);
+        if (isNewFilter) {
+          isFilterChangeFetch.current = false; // Reset flag
+        }
+        console.log("Fetch cycle complete.");
+      }
+    },
+    [isLoading, hasMore, offset, searchTerm, selectedTypes, sortBy, pokemonList]
+  );
 
   // =-=-=-=-=-= HANDLERS =-=-=-=-=-=
   // Filters and Sort to be passed to FilterBox

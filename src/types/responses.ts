@@ -59,6 +59,14 @@ export interface GetPokemonOptions {
   sort?: SortByType;
 }
 
+// What is returned in our service layer
+export interface ApiPokemonResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: PokemonCardProps[];
+}
+
 export interface ButtonProps {
   name: string;
   label?: string;
