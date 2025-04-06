@@ -134,7 +134,11 @@ async function getPokemonDetails(
 
   const detailedResults = await Promise.all(detailPromises);
 
-  return [];
+  const filteredResults = detailedResults.filter(
+    (p): p is PokemonCardProps => p !== null
+  );
+  console.log(`Filtered detailed results count: ${filteredResults.length}`);
+  return filteredResults;
 }
 
 // =-=-=-=-=-=-= MAIN SERVICE =-=-=-=-=-=-=-=

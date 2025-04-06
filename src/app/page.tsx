@@ -115,10 +115,17 @@ export default function Home() {
         console.log("Fetch cycle complete.");
       }
     },
-    [isLoading, hasMore, offset, searchTerm, selectedTypes, sortBy, pokemonList]
+    [isLoading, hasMore, offset, searchTerm, selectedTypes, sortBy]
   );
 
   // =-=-=-=-=-= HANDLERS =-=-=-=-=-=
+  useEffect(() => {
+    // Fetch when searchTerm, selectedTypes, or sortBy changes.
+    // The 'true' argument signifies this is a fetch due to new filters.
+    console.log("Filter/Sort changed. Triggering refetch.");
+    fetchPokemon(true);
+  }, [searchTerm, selectedTypes, sortBy]);
+
   // Filters and Sort to be passed to FilterBox
   const handleSearchChange = useCallback((term: string) => {
     setSearchTerm(term);
@@ -136,84 +143,32 @@ export default function Home() {
     setSortBy(sortKey);
   }, []);
 
-  // =-=-=-=-=-= COMPUTED VALUES =-=-=-=-=-=
-  const displayedCards = useMemo(() => {
-    console.log(
-      `Filtering/Sorting: Term='${searchTerm}', Types=[${selectedTypes.join(
-        ", "
-      )}], Sort='${sortBy}'`
-    );
-    let filtered = [...allFetchedPokemon];
-
-    // STEP 1: Filter by Search Term (Name or ID)
-    if (searchTerm.trim()) {
-      const lowerSearchTerm = searchTerm.trim().toLowerCase();
-      filtered = filtered.filter(
-        (pokemon) =>
-          pokemon.name.toLowerCase().includes(lowerSearchTerm) ||
-          pokemon.id.toString() === lowerSearchTerm ||
-          formatPokemonId(pokemon.id).includes(lowerSearchTerm)
-      );
-    }
-
-    // STEP 2: Filter by Selected Types
-    if (selectedTypes.length > 0) {
-      filtered = filtered.filter((pokemon) =>
-        selectedTypes.some((selectedType) =>
-          pokemon.types.includes(selectedType)
-        )
-      );
-    }
-
-    // STEP 3: Sort
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "name_asc":
-          return a.name.localeCompare(b.name);
-        case "name_desc":
-          return b.name.localeCompare(a.name);
-        case "id_desc":
-          return b.id - a.id;
-        case "id_asc":
-          return a.id - b.id;
-      }
-    });
-
-    console.log("Displayed cards after filtering/sorting: ", filtered.length);
-    return filtered;
-  }, [allFetchedPokemon, searchTerm, selectedTypes, sortBy]);
-
   // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
-  // Effect for initial load
+  // Effect for infinite load (Scroll)
   useEffect(() => {
-    if (allFetchedPokemon.length === 0 && !error && !isLoading) {
-      console.log("Initial load: Fetching first batch...");
-      fetchPokemon();
-    }
-  }, [allFetchedPokemon.length, error, isLoading, fetchPokemon]);
+    // Don't observe if loading, no more data, or if a filter change fetch is in progress
+    if (isLoading || !hasMore || isFilterChangeFetch.current) return;
 
-  // Effect for setting up infinite load
-  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          console.log("Observer triggered, fetching more...");
-          fetchPokemon();
+        // Check intersection and ensure it's not during a filter change
+        if (
+          entries[0].isIntersecting &&
+          !isLoading &&
+          !isFilterChangeFetch.current
+        ) {
+          console.log("Observer triggered fetch (scroll)");
+          fetchPokemon(false); // 'false' indicates a scroll fetch, not new filters
         }
       },
-      {
-        rootMargin: "0px",
-        threshold: 0.1, // Trigger when 10% visible
-      }
+      { threshold: 0.1 } // Trigger when 10% is visible
     );
 
-    const currentObserverRef = observerRef.current; // Capture ref value
-
+    const currentObserverRef = observerRef.current;
     if (currentObserverRef) {
       observer.observe(currentObserverRef);
     }
 
-    // Cleanup
     return () => {
       if (currentObserverRef) {
         observer.unobserve(currentObserverRef);
@@ -236,7 +191,7 @@ export default function Home() {
 
         {/* Main Card List */}
         <div className="w-full md:w-auto flex flex-row flex-wrap gap-2 p-4 md:flex-1 justify-center md:justify-start">
-          {displayedCards.map((pokemon, index) => (
+          {pokemonList.map((pokemon, index) => (
             <motion.div
               key={pokemon.id}
               initial={{
@@ -280,11 +235,11 @@ export default function Home() {
             Loading more Pokemon...
           </p>
         )}
-        {!isLoading && !hasMore && displayedCards.length > 0 && (
+        {!isLoading && !hasMore && pokemonList.length > 0 && (
           <p className="text-gray-500">-- End of List --</p>
         )}
         {error && <p className="text-gray-600 font-semibold p-4">{error}</p>}
-        {!isLoading && hasMore && displayedCards.length === 0 && !error && (
+        {!isLoading && hasMore && pokemonList.length === 0 && !error && (
           <p className="texxt-gray-400">Scroll down to load more Pokemon!</p>
         )}
       </div>

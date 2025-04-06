@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       count: results.totalCount,
       next:
         offset + limit < results.totalCount
-          ? `api/pokemon?limit=${limit}&offset=${offset + limit}${
+          ? `/api/pokemon?limit=${limit}&offset=${offset + limit}${
               search ? `&search=${search}` : ""
             }${typesParam ? `&types=${typesParam}` : ""}&sort=${sort}`
           : null,
