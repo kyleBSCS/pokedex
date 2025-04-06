@@ -6,19 +6,11 @@ import Card from "@/components/card";
 import FilterBox from "@/components/filterbox";
 import Image from "next/image";
 import * as motion from "motion/react-client";
-import Details from "@/components/details";
-import { formatPokemonId } from "@/utils/helper";
 import {
-  PokemonDetail,
-  PokeApiPokemonListResponse,
   ApiPokemonResponse,
   PokemonCardProps,
   SortByType,
 } from "@/types/types";
-
-// Limits how many pokemon cards to fetch per batch
-// I increased this from 10 to 30 due to animation bugs when the screen is large enough that it can view more than 10 cards at once
-const POKE_LIMIT = 30;
 
 const loadingQuotes = [
   "Fetching data... it's super effective!",
@@ -40,6 +32,10 @@ export default function Home() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortByType>("id_asc");
   const [randomIndex, setRandomIndex] = useState(0);
+
+  // Limits how many pokemon cards to fetch per batch
+  // I increased this from 10 to 30 due to animation bugs when the screen is large enough that it can view more than 10 cards at once
+  const [cardAmtPerBatch, setCardAmtPerBatch] = useState(30);
 
   // For the trigger that loads more cards
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -67,14 +63,14 @@ export default function Home() {
       setRandomIndex(Math.floor(Math.random() * loadingQuotes.length));
 
       console.log(
-        `FETCH: Offset=${currentOffset}, Limit=${POKE_LIMIT}, Search='${searchTerm}', Types='${selectedTypes.join(
+        `FETCH: Offset=${currentOffset}, Limit=${cardAmtPerBatch}, Search='${searchTerm}', Types='${selectedTypes.join(
           ","
         )}', Sort='${sortBy}'`
       );
 
       try {
         const params = new URLSearchParams({
-          limit: String(POKE_LIMIT),
+          limit: String(cardAmtPerBatch),
           offset: String(currentOffset),
           sort: sortBy,
         });
@@ -96,19 +92,12 @@ export default function Home() {
         const data: ApiPokemonResponse = await res.json();
         console.log("API Response Data: ", data);
 
-        // Filter out dupes
         const newPokemon = data.results;
-        const currentIds = new Set(
-          isNewFilter ? [] : pokemonList.map((p) => p.id)
-        );
-        const uniqueNewPokemon = newPokemon.filter(
-          (p) => !currentIds.has(p.id)
-        );
 
         setPokemonList((prevList) =>
-          isNewFilter ? uniqueNewPokemon : [...prevList, ...uniqueNewPokemon]
+          isNewFilter ? newPokemon : [...prevList, ...newPokemon]
         );
-        setOffset(currentOffset + POKE_LIMIT);
+        setOffset(currentOffset + cardAmtPerBatch);
         setHasMore(data.next !== null);
         setTotalCount(data.count);
         setError(null);
@@ -135,7 +124,7 @@ export default function Home() {
     // The 'true' argument signifies this is a fetch due to new filters.
     console.log("Filter/Sort changed. Triggering refetch.");
     fetchPokemon(true);
-  }, [searchTerm, selectedTypes, sortBy]);
+  }, [searchTerm, selectedTypes, sortBy, cardAmtPerBatch]);
 
   // Filters and Sort to be passed to FilterBox
   const handleSearchChange = useCallback((term: string) => {
@@ -152,6 +141,10 @@ export default function Home() {
 
   const handleSortChange = useCallback((sortKey: SortByType) => {
     setSortBy(sortKey);
+  }, []);
+
+  const handleCardViewAmt = useCallback((amount: number) => {
+    setCardAmtPerBatch(amount);
   }, []);
 
   // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
@@ -198,6 +191,8 @@ export default function Home() {
           onSearchChange={handleSearchChange}
           onTypeToggle={handleTypeToggle}
           onSortChange={handleSortChange}
+          cardAmount={cardAmtPerBatch}
+          onCardViewAmtChange={handleCardViewAmt}
         />
 
         {/* Main Card List */}
@@ -222,7 +217,7 @@ export default function Home() {
               transition={{
                 duration: 0.3,
                 ease: "easeOut",
-                delay: (index % POKE_LIMIT) * 0.05, // Staggered delay for each card
+                delay: (index % cardAmtPerBatch) * 0.05, // Staggered delay for each card
               }}
             >
               <Card
@@ -239,7 +234,7 @@ export default function Home() {
       {/* Status Messages */}
       <div
         ref={observerRef}
-        className="h-20 flex justify-center items-center w-full text-center"
+        className="h-20 flex justify-center sm:justify-start sm:pl-4 sm:pb-4 items-center w-full text-center"
       >
         {isLoading && (
           <div className="flex gap-2 items-center justify-center">

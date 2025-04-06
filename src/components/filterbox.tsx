@@ -9,11 +9,14 @@ export default function FilterBox({
   searchTerm,
   selectedTypes,
   sortBy,
+  cardAmount,
   onSearchChange,
   onTypeToggle,
   onSortChange,
+  onCardViewAmtChange,
 }: FilterBoxProps) {
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+  const [localDisplayCount, setLocalDisplayCount] = useState(cardAmount);
 
   useEffect(() => {
     setLocalSearchTerm(searchTerm);
@@ -110,37 +113,54 @@ export default function FilterBox({
               </div>
             </div>
 
-            {/* Filters */}
-            <div>
-              <h1 className="text-2xl font-bold mb-4">Sort by</h1>
-              <div className="grid grid-cols-3 gap-1">
-                <Button
-                  name="id_asc"
-                  label="ID Ascending"
-                  isActive={sortBy === "id_asc"}
-                  onClick={() => onSortChange("id_asc")}
-                  colorType="sort"
-                />
-                <Button
-                  name="id_desc"
-                  label="ID Descending"
-                  isActive={sortBy === "id_desc"}
-                  onClick={() => onSortChange("id_desc")}
-                  colorType="sort"
-                />
-                <Button
-                  name="name_asc"
-                  label="Name A-Z"
-                  isActive={sortBy === "name_asc"}
-                  onClick={() => onSortChange("name_asc")}
-                  colorType="sort"
-                />
-                <Button
-                  name="name_desc"
-                  label="Name Z-A"
-                  isActive={sortBy === "name_desc"}
-                  onClick={() => onSortChange("name_desc")}
-                  colorType="sort"
+            {/* Sorting and Display Count */}
+            <div className="flex w-full gap-4">
+              <div className="w-2/3">
+                <h1 className="text-2xl font-bold mb-4">Sort by</h1>
+                <div className="grid grid-cols-2 gap-1">
+                  <Button
+                    name="id_asc"
+                    label="ID Ascending"
+                    isActive={sortBy === "id_asc"}
+                    onClick={() => onSortChange("id_asc")}
+                    colorType="sort"
+                  />
+                  <Button
+                    name="id_desc"
+                    label="ID Descending"
+                    isActive={sortBy === "id_desc"}
+                    onClick={() => onSortChange("id_desc")}
+                    colorType="sort"
+                  />
+                  <Button
+                    name="name_asc"
+                    label="Name A-Z"
+                    isActive={sortBy === "name_asc"}
+                    onClick={() => onSortChange("name_asc")}
+                    colorType="sort"
+                  />
+                  <Button
+                    name="name_desc"
+                    label="Name Z-A"
+                    isActive={sortBy === "name_desc"}
+                    onClick={() => onSortChange("name_desc")}
+                    colorType="sort"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h1 className="text-2xl font-bold mb-4">Display Count</h1>
+                <input
+                  type="number"
+                  value={cardAmount}
+                  onChange={(e) => {
+                    const newValue = Number(e.target.value);
+                    setLocalDisplayCount(newValue);
+                    onCardViewAmtChange(localDisplayCount);
+                  }}
+                  className="border border-gray-300 rounded-md p-2 w-full"
+                  placeholder="Enter # of cards"
                 />
               </div>
             </div>
