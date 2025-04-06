@@ -1,7 +1,15 @@
 import Button from "./button";
 import { POKEMON_TYPES } from "@/types/responses";
+import { FilterBoxProps } from "@/types/responses";
 
-export default function FilterBox() {
+export default function FilterBox({
+  searchTerm,
+  selectedTypes,
+  sortBy,
+  onSearchChange,
+  onTypeToggle,
+  onSortChange,
+}: FilterBoxProps) {
   // Define the polygon string directly for the clip-path style
   const clipPathStyle = `polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px))`;
 
@@ -72,9 +80,34 @@ export default function FilterBox() {
             <div>
               <h1 className="text-2xl font-bold mb-4">Sort by</h1>
               <div className="grid grid-cols-3 gap-1">
-                <Button name="Grass" />
-                <Button name="Fire" />
-                <Button name="Water" />
+                <Button
+                  name="id_asc"
+                  label="ID Ascending"
+                  isActive={sortBy === "id_asc"}
+                  onClick={() => onSortChange("id_asc")}
+                  colorType="sort"
+                />
+                <Button
+                  name="id_desc"
+                  label="ID Descending"
+                  isActive={sortBy === "id_desc"}
+                  onClick={() => onSortChange("id_desc")}
+                  colorType="sort"
+                />
+                <Button
+                  name="name_asc"
+                  label="Name A-Z"
+                  isActive={sortBy === "name_asc"}
+                  onClick={() => onSortChange("name_asc")}
+                  colorType="sort"
+                />
+                <Button
+                  name="name_desc"
+                  label="Name Z-A"
+                  isActive={sortBy === "name_desc"}
+                  onClick={() => onSortChange("name_desc")}
+                  colorType="sort"
+                />
               </div>
             </div>
           </div>

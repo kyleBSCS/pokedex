@@ -160,7 +160,22 @@ export default function Home() {
     }
 
     // STEP 3: Sort
-  }, []);
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "name_asc":
+          return a.name.localeCompare(b.name);
+        case "name_desc":
+          return b.name.localeCompare(a.name);
+        case "id_desc":
+          return b.id - a.id;
+        case "id_asc":
+          return a.id - b.id;
+      }
+    });
+
+    console.log("Displayed cards after filtering/sorting: ", filtered.length);
+    return filtered;
+  }, [allFetchedPokemon, searchTerm, selectedTypes, sortBy]);
 
   // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
   // Effect for initial load
@@ -204,11 +219,18 @@ export default function Home() {
     <div className="font-mono relative">
       <div className=" mx-auto mt-12 flex flex-col md:flex-row justify-center">
         {/* Filter Box */}
-        <FilterBox />
+        <FilterBox
+          searchTerm={searchTerm}
+          selectedTypes={selectedTypes}
+          sortBy={sortBy}
+          onSearchChange={handleSearchChange}
+          onTypeToggle={handleTypeToggle}
+          onSortChange={handleSortChange}
+        />
 
         {/* Main Card List */}
         <div className="w-full md:w-auto flex flex-row flex-wrap gap-2 p-4 md:flex-1 justify-center md:justify-start">
-          {cards.map((pokemon, index) => (
+          {displayedCards.map((pokemon, index) => (
             <motion.div
               key={pokemon.id}
               initial={{
@@ -252,11 +274,11 @@ export default function Home() {
             Loading more Pokemon...
           </p>
         )}
-        {!isLoading && !hasMore && cards.length > 0 && (
+        {!isLoading && !hasMore && displayedCards.length > 0 && (
           <p className="text-gray-500">-- End of List --</p>
         )}
         {error && <p className="text-gray-600 font-semibold p-4">{error}</p>}
-        {!isLoading && hasMore && cards.length === 0 && !error && (
+        {!isLoading && hasMore && displayedCards.length === 0 && !error && (
           <p className="texxt-gray-400">Scroll down to load more Pokemon!</p>
         )}
       </div>
