@@ -3,13 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
-
-export interface PokemonCardProps {
-  id: number;
-  name: string;
-  imageUrl: string;
-  types: string[];
-}
+import { PokemonCardProps } from "@/types/responses";
 
 export default function Card() {
   const [isSelected, setIsSelected] = useState(false);
