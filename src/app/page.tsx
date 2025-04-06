@@ -7,6 +7,7 @@ import FilterBox from "@/components/filterbox";
 import Image from "next/image";
 import * as motion from "motion/react-client";
 import Details from "@/components/details";
+import { formatPokemonId } from "@/utils/helper";
 
 // const cardItems = Array.from({ length: 20 }, (_, index) => index);
 
