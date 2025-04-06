@@ -179,13 +179,18 @@ export interface ButtonProps {
   colorType?: "type" | "sort" | "default";
 }
 
-export interface FilterBoxProps {
+export interface AppliedFilters {
   searchTerm: string;
   selectedTypes: string[];
   sortBy: SortByType;
-  cardAmount: number;
-  onSearchChange: (term: string) => void;
-  onTypeToggle: (type: string) => void;
-  onSortChange: (sortKey: SortByType) => void;
-  onCardViewAmtChange: (amount: number) => void;
+  displayCount: number;
+}
+
+export interface FilterBoxProps {
+  initialSearchTerm: string;
+  initialSelectedTypes: string[];
+  initialSortBy: SortByType;
+  initialDisplayCount: number;
+
+  onApply: (appliedFilters: AppliedFilters) => void;
 }
