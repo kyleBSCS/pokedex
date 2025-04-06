@@ -116,6 +116,18 @@ export default function Home() {
     setSearchTerm(term);
   }, []);
 
+  const handleTypeToggle = useCallback((type: string) => {
+    setSelectedTypes((prevTypes) =>
+      prevTypes.includes(type)
+        ? prevTypes.filter((t) => t !== type)
+        : [...prevTypes, type]
+    );
+  }, []);
+
+  const handleSortChange = useCallback((sortKey: SortByType) => {
+    setSortBy(sortKey);
+  }, []);
+
   // Effect for initial load
   useEffect(() => {
     if (allFetchedPokemon.length === 0 && !error && !isLoading) {
