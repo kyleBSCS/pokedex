@@ -14,8 +14,6 @@ import {
   PokemonCardProps,
 } from "@/types/responses";
 
-// const cardItems = Array.from({ length: 20 }, (_, index) => index);
-
 // Limits how many pokemon cards to fetch per batch
 const POKE_LIMIT = 20;
 
@@ -79,7 +77,8 @@ export default function Home() {
           name: detail.name,
           // TODO: Add fallback image
           imageUrl:
-            detail.sprites.other?.["official-artwork"]?.front_default ?? "",
+            detail.sprites.other?.["official-artwork"]?.front_default ??
+            "/fallback.webp",
           types: detail.types.map((typeInfo) => typeInfo.type.name),
         }));
 
@@ -135,9 +134,9 @@ export default function Home() {
 
         {/* Main Card List */}
         <div className="w-full md:w-auto flex flex-row flex-wrap gap-2 p-4 md:flex-1 justify-center md:justify-start">
-          {cardItems.map((item, index) => (
+          {cards.map((pokemon, index) => (
             <motion.div
-              key={index}
+              key={pokemon.id}
               initial={{
                 opacity: 0,
                 x: 600, // Start far right (relative to final position)
@@ -155,10 +154,15 @@ export default function Home() {
               transition={{
                 duration: 0.3,
                 ease: "easeOut",
-                delay: index * 0.05, // Staggered delay for each card
+                delay: (index % POKE_LIMIT) * 0.05, // Staggered delay for each card
               }}
             >
-              <Card />
+              <Card
+                id={pokemon.id}
+                name={pokemon.name}
+                imageUrl={pokemon.imageUrl}
+                types={pokemon.types}
+              />
             </motion.div>
           ))}
         </div>
@@ -168,7 +172,7 @@ export default function Home() {
       {/* Background Image */}
       <div className="fixed bottom-0 right-0 w-full h-full -z-10">
         <Image
-          src="/pokeball.svg" // Change this to your actual image path
+          src="/pokeball.svg"
           alt="Background"
           layout="fill"
           objectFit="cover"

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const apiUrl = `${BASE_URL}/pokemon?limit=${limit}&offset=${offset}`;
     const response = await fetch(apiUrl);
 
-    // Check if it returns an error
+    // Check if it returns an erraor
     if (!response.ok) {
       console.error(`PokeAPI Error: ${response.status} ${response.statusText}`);
       return NextResponse.json(

@@ -4,11 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import { PokemonCardProps } from "@/types/responses";
+import { formatPokemonId } from "@/utils/helper";
+import { getBGColorForType } from "@/utils/typeColors";
 
-export default function Card() {
+export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
   const [isSelected, setIsSelected] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const cardRef = useRef(null);
+  const [imageError, setImageError] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Animations variants for different states of the card
   const cardVariants = {
@@ -48,14 +51,14 @@ export default function Card() {
     return "initial";
   };
 
-  const handleCardClick = (event) => {
+  const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    setIsSelected(true);
+    console.log(`Selected Pokemon: ${name} (ID: ${id})`);
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (cardRef.current && !cardRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
         setIsSelected(false);
       }
     };
@@ -64,6 +67,9 @@ export default function Card() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const primaryType = types[0] || "normal";
+  const cardBgColor = getBGColorForType(primaryType);
 
   return (
     <motion.div
@@ -82,21 +88,26 @@ export default function Card() {
     >
       {/* ID */}
       <h1 className="font-sans text-5xl text-right text-gray-900 tracking-wide pt-4 pr-4">
-        #010
+        {formatPokemonId(id)}
       </h1>
 
       {/* Picture */}
       <div className="relative w-full flex justify-center items-center ">
         {/* Background Rectangle */}
-        <div className="absolute w-[205px] h-[205px] bg-lime-300 rounded-4xl"></div>
+        <div
+          className="absolute w-[205px] h-[205px rounded-4xl"
+          style={{ backgroundColor: cardBgColor }}
+        ></div>
 
         {/* Pokémon Image */}
         <Image
           draggable="false"
-          src="/010.png"
+          src={imageError ? "/fallback.webp" : imageUrl}
           width={300}
           height={300}
-          alt="Caterpie"
+          alt={name}
+          onError={() => setImageError(true)}
+          priority={id <= 20}
           className="relative select-none"
         />
       </div>
@@ -104,14 +115,18 @@ export default function Card() {
       {/* Types and Name */}
       <div className="font-mono pl-4 mt-1">
         <div className="flex gap-1">
-          <h1 className="font-semibold text-md text-white bg-red-500 px-2 rounded-xl">
-            Fire
-          </h1>
-          <h1 className="font-semibold text-md text-white bg-green-700 px-2 rounded-xl">
-            Bug
-          </h1>
+          {/* Types */}
+          {types.map((type) => (
+            <span
+              key={type}
+              className={`font-semibold text-xs text-white px-2.5 py-0.5 rounded-full shadow capitalize`}
+              style={{ backgroundColor: getBGColorForType(type) }}
+            >
+              {type}
+            </span>
+          ))}
         </div>
-        <h1 className="text-3xl font-bold mt-1">Caterpie</h1>
+        <h1 className="text-3xl font-bold mt-1">{name}</h1>
       </div>
     </motion.div>
   );
