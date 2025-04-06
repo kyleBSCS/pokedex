@@ -13,7 +13,7 @@ export default function Details() {
           {/* Picture */}
           <div className="relative w-full flex justify-center items-center ">
             {/* Background Rectangle */}
-            <div className="absolute w-[205px] h-[205px] bg-lime-300 rounded-4xl"></div>
+            <div className="absolute w-[205px] h-[205px] sm:w-[150px] sm:h-[150px] lg:w-[205px] lg:h-[205px] bg-lime-300 rounded-4xl"></div>
             {/* Pokémon Image */}
             <Image
               draggable="false"
@@ -130,6 +130,9 @@ export default function Details() {
         </div>
 
         {/* Background Element of ID */}
+        <div className="hidden sm:block absolute bottom-4 right-4 text-6xl text-gray-300 font-bold">
+          #010
+        </div>
       </div>
     </div>
   );
