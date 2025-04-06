@@ -5,6 +5,7 @@ import {
   PokeApiResource,
   PokeApiPokemonListResponse,
   PokeApiTypeResponse,
+  GetPokemonOptions,
 } from "@/types/responses";
 import { formatPokemonId } from "@/utils/helper";
 
@@ -137,3 +138,67 @@ async function getPokemonDetails(
 }
 
 // =-=-=-=-=-=-= MAIN SERVICE =-=-=-=-=-=-=-=
+export async function getPokemon(
+  options: GetPokemonOptions
+): Promise<{ pokemon: PokemonCardProps[]; totalCount: number }> {
+  const { limit, offset, search, types, sort = "id_asc" } = options;
+  console.log("getPokemon Service Options:", options);
+
+  let basePokemonList: PokeApiResource[];
+
+  // STEP 1: Determine Base List
+  if (types && types.length > 0) {
+    basePokemonList = await getPokemonByTypes(types);
+  } else {
+    basePokemonList = await getFullPokemonList();
+  }
+
+  // STEP 2: Apply Search Filter (if user wants to search)
+  let filteredList = basePokemonList;
+  if (search && search.trim()) {
+    const lowerSearchTerm = search.trim().toLowerCase();
+    filteredList = basePokemonList.filter((pokemon) => {
+      const idMatch = pokemon.url.match(/\/(\d+)\/?$/); // Extract the ID from URL
+      const pokemonId = idMatch ? idMatch[1] : null;
+      const formattedId = pokemonId
+        ? formatPokemonId(parseInt(pokemonId, 10))
+        : "";
+
+      return (
+        pokemon.name.toLowerCase().includes(lowerSearchTerm) ||
+        pokemonId === lowerSearchTerm || // Exact ID match
+        formattedId.includes(lowerSearchTerm) // Match #000 format
+      );
+    });
+
+    console.log(
+      `Filtered by search "${search}". Count: ${filteredList.length}`
+    );
+  }
+
+  // STEP 3: Apply Sorting
+  filteredList.sort((a, b) => {
+    // Extract the ID
+    const idA = parseInt(a.url.split("/").filter(Boolean).pop() || "0", 10);
+    const idB = parseInt(b.url.split("/").filter(Boolean).pop() || "0", 10);
+
+    switch (sort) {
+      case "name_asc":
+        return a.name.localeCompare(b.name);
+      case "name_desc":
+        return b.name.localeCompare(a.name);
+      case "id_desc":
+        return idB - idA;
+      case "id_asc":
+      default:
+        return idA - idB;
+    }
+  });
+  console.log(`Sorted by "${sort}".`);
+
+  // STEP 4: Apply Pagination
+  // STEP 5: Fetch Details for the Paginated List
+  // STEP 6: Return Results
+
+  return { pokemon: detailedPokemon, totalCount: totalCount };
+}

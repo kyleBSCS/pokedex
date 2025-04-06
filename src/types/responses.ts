@@ -51,6 +51,14 @@ export interface PokemonCardProps {
   types: string[];
 }
 
+export interface GetPokemonOptions {
+  limit: number;
+  offset: number;
+  search?: string;
+  types?: string[];
+  sort?: SortByType;
+}
+
 export interface ButtonProps {
   name: string;
   label?: string;
