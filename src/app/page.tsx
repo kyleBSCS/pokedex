@@ -1,12 +1,129 @@
-import Card from "@/components/card";
+"use client";
+
+import { useEffect, useState, useRef, useCallback } from "react";
+
+import Card, { PokemonCardProps } from "@/components/card";
 import FilterBox from "@/components/filterbox";
 import Image from "next/image";
 import * as motion from "motion/react-client";
 import Details from "@/components/details";
 
-const cardItems = Array.from({ length: 20 }, (_, index) => index);
+// const cardItems = Array.from({ length: 20 }, (_, index) => index);
+
+// Structure of the JSON for the details of a pokemon
+interface PokemonDetail {
+  id: number;
+  name: string;
+  sprites: {
+    other?: {
+      dream_world?: {
+        front_default: string | null;
+      };
+      "official-artwork"?: {
+        front_default: string | null;
+      };
+    };
+    front_default: string | null;
+  };
+  types: Array<{
+    slot: number;
+    type: {
+      name: string;
+      url: string;
+    };
+  }>;
+}
+
+// Structure of the JSON for the list of pokemon
+interface PokemonListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Array<{ name: string; url: string }>;
+}
+
+// Limits how many pokemon cards to fetch per batch
+const POKE_LIMIT = 20;
 
 export default function Home() {
+  const [cards, setCards] = useState<PokemonCardProps[]>([]);
+  const [offset, setOffset] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // For the trigger that loads more cards
+  const observerRef = useRef<HTMLDivElement | null>(null);
+
+  // Memoized callback function for fetching pokemon
+  const fetchPokemon = useCallback(async () => {
+    // Prevent fetching if already loading, no more data, or an error occured
+    if (isLoading || !hasMore || error) return;
+
+    setIsLoading(true);
+    setError(null);
+    console.log(`Fetching Pokemon: limit=${POKE_LIMIT}, offset=${offset}`);
+
+    try {
+      // STEP 1: Fetch list of Pokemon names and detail URLs
+      const listResponse = await fetch(
+        `api/pokemon?limit=${POKE_LIMIT}&offset=${offset}`
+      );
+      if (!listResponse.ok) {
+        throw new Error(`API List Error: ${listResponse.statusText}`);
+      }
+      const listData: PokemonListResponse = await listResponse.json();
+
+      // STEP 3: Fetch details for each Pokemon in the list concurrently
+      const detailPromises = listData.results.map(async (pokemon) => {
+        try {
+          // Use the direct PokeAPI URL for details
+          const detailRes = await fetch(pokemon.url);
+          if (!detailRes.ok) {
+            console.warn(
+              `Failed to fetch details for ${pokemon.name}: ${detailRes.statusText}`
+            );
+            return null; // Skip this Pokemon if details fail
+          }
+          return (await detailRes.json()) as PokemonDetail;
+        } catch (detailError) {
+          console.error(
+            `Error fetching details for ${pokemon.name}:`,
+            detailError
+          );
+          return null; // Skip on error
+        }
+      });
+
+      const detailedResults = await Promise.all(detailPromises);
+
+      // STEP 3: Filter out null results and format data for the cards
+      const newPokemon = detailedResults
+        .filter((detail): detail is PokemonDetail => detail !== null)
+        .map((detail) => ({
+          id: detail.id,
+          name: detail.name,
+          // TODO: Add fallback image
+          imageUrl:
+            detail.sprites.other?.["official-artwork"]?.front_default ?? "",
+          types: detail.types.map((typeInfo) => typeInfo.type.name),
+        }));
+
+      // STEP 4: Update states
+      setCards((prevList) => [...prevList, ...newPokemon]);
+      setOffset((prevOffset) => prevOffset + POKE_LIMIT);
+      setHasMore(listData.next !== null); // Check if there's a next page URL
+    } catch (fetchError: any) {
+      console.error("Failed to fetch Pokemon:", fetchError);
+      setError(
+        `Failed to load Pokemon: ${fetchError.message}. Please try refreshing.`
+      );
+      setHasMore(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, hasMore, offset, error]);
+
   return (
     <div className="font-mono relative">
       <div className=" mx-auto mt-12 flex flex-col md:flex-row justify-center">
@@ -43,7 +160,7 @@ export default function Home() {
           ))}
         </div>
       </div>
-      <Details />
+      {/* <Details /> */}
 
       {/* Background Image */}
       <div className="fixed bottom-0 right-0 w-full h-full -z-10">
