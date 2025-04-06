@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Button from "./button";
-import { POKEMON_TYPES } from "@/types/responses";
-import { FilterBoxProps } from "@/types/responses";
+import { POKEMON_TYPES } from "@/types/types";
+import { FilterBoxProps } from "@/types/types";
 
 export default function FilterBox({
   searchTerm,

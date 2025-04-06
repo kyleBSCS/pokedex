@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { PokemonCardProps } from "@/types/responses";
+import { PokemonCardProps } from "@/types/types";
 import { formatPokemonId } from "@/utils/helper";
 import { getBGColorForType } from "@/utils/typeColors";
 

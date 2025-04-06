@@ -1,4 +1,4 @@
-import { ButtonProps } from "@/types/responses";
+import { ButtonProps } from "@/types/types";
 import { getBGColorForType } from "@/utils/typeColors";
 
 export default function Button({

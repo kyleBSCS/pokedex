@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { SortByType } from "@/types/responses";
+import { SortByType } from "@/types/types";
 import { getPokemon } from "@/app/services/pokemon.service";
 
 export async function GET(request: NextRequest) {

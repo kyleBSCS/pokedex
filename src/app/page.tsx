@@ -14,7 +14,7 @@ import {
   ApiPokemonResponse,
   PokemonCardProps,
   SortByType,
-} from "@/types/responses";
+} from "@/types/types";
 
 // Limits how many pokemon cards to fetch per batch
 // I increased this from 10 to 30 due to animation bugs when the screen is large enough that it can view more than 10 cards at once

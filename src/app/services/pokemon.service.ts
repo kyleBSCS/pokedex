@@ -6,7 +6,7 @@ import {
   PokeApiPokemonListResponse,
   PokeApiTypeResponse,
   GetPokemonOptions,
-} from "@/types/responses";
+} from "@/types/types";
 import { formatPokemonId } from "@/utils/helper";
 
 const BASE_URL = "https://pokeapi.co/api/v2";
