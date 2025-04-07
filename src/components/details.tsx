@@ -1,5 +1,5 @@
 import { PokemonDetailedViewData } from "@/types/types";
-import { formatPokemonId } from "@/utils/helper";
+import { formatPokemonId, formatStatName } from "@/utils/helper";
 import { getBGColorForType } from "@/utils/typeColors";
 import Image from "next/image";
 
@@ -124,56 +124,63 @@ export default function Details({
 
           {/* Description */}
           <p className="font-mono font-bold text-gray-700 text-xl tracking-tight sm:pl-4 mt-2">
-            Often hides in water to stalk unwary prey. For swimming fast, it
-            moves its ears to maintain balance.
+            {description}
           </p>
 
           {/* Base Stats */}
-          <div className="flex flex-col gap-2 mt-4 sm:pl-4">
-            <h1 className="text-2xl font-bold">Base Stats</h1>
-            <div className="flex justify-between">
-              <span>HP</span>
-              <span>45</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Attack</span>
-              <span>49</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Defense</span>
-              <span>65</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Special Attack</span>
-              <span>65</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Special Defense</span>
-              <span>55</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Speed</span>
-              <span>45</span>
-            </div>
+          <div className="flex flex-col gap-1 mt-4 sm:pl-4">
+            <h3 className="text-xl lg:text-2xl font-bold mb-2">Base Stats</h3>
+            {stats.map((stat) => (
+              <div
+                key={stat.name}
+                className="grid grid-cols-[max-content_1fr_max-content] gap-2 items-center text-sm lg:text-base"
+              >
+                <span className="font-semibold text-gray-600">
+                  {formatStatName(stat.name)}
+                </span>
+                {/* Basic Progress Bar (Optional but nice) */}
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="h-2.5 rounded-full
+                    "
+                    style={{
+                      width: `${Math.min(100, (stat.value / 255) * 100)}%`,
+                      backgroundColor: getBGColorForType(types[0]),
+                    }}
+                  ></div>{" "}
+                  {/* Max stat assumed ~255 */}
+                </div>
+                <span className="font-bold text-right w-8">{stat.value}</span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Second Column: Pokedex Data, Training, Defenses, Evolution */}
-        <div className="flex flex-col gap-4 sm:pl-12">
+        <div className="flex flex-col gap-4 sm:pl-12 flex-grow">
           {/* Pokedex Data */}
-          <h1 className="text-2xl font-bold">Pokédex Data</h1>
-          <div className="flex w-full gap-4">
-            <div className="flex flex-col gap-2 font-bold text-gray-600">
-              <span>Species</span>
-              <span>Height</span>
-              <span>Weight</span>
-              <span>Abilities</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span>Bug Pokémon</span>
-              <span>1'00"</span>
-              <span>6.4 lbs</span>
-              <span>Shield Dust</span>
+          <div>
+            <h3 className="text-xl lg:text-2xl font-bold mb-2">Pokédex Data</h3>
+            <div className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm lg:text-base">
+              <span className="font-semibold text-gray-600">Species</span>
+              <span className="capitalize">{species}</span>
+
+              <span className="font-semibold text-gray-600">Height</span>
+              <span>{formattedHeight}</span>
+
+              <span className="font-semibold text-gray-600">Weight</span>
+              <span>{formattedWeight}</span>
+
+              <span className="font-semibold text-gray-600">Abilities</span>
+              <span className="capitalize">
+                {abilities.map((ability, index) => (
+                  <span key={ability}>
+                    {ability.replace("-", " ")}
+                    {index < abilities.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </span>
+              {/* Add more fields like Gender Ratio, Egg Groups if fetched */}
             </div>
           </div>
 

@@ -4,7 +4,7 @@ export const formatPokemonId = (id: number): string => {
 };
 
 // Helper function to format stat names
-const formatStatName = (name: string): string => {
+export const formatStatName = (name: string): string => {
   switch (name) {
     case "hp":
       return "HP";
