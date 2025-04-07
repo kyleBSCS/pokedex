@@ -315,6 +315,14 @@ export default function Home() {
       </div>
 
       {/* <Details /> */}
+      {selectedPokemonId && (
+        <Details
+          pokemonData={detailedPokemonData}
+          isLoading={isDetailLoading}
+          error={detailError}
+          onClose={handleCloseDetails}
+        />
+      )}
 
       {/* Background Image */}
       <div className="fixed bottom-0 right-0 w-full h-full -z-10">

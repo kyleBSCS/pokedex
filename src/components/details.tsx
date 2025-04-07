@@ -1,6 +1,69 @@
+import { PokemonDetailedViewData } from "@/types/types";
 import Image from "next/image";
 
-export default function Details() {
+interface DetailsProps {
+  pokemonData: PokemonDetailedViewData | null;
+  isLoading: boolean;
+  error: string | null;
+  onClose: () => void;
+}
+
+export default function Details({
+  pokemonData,
+  isLoading,
+  error,
+  onClose,
+}: DetailsProps) {
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
+        <div className="bg-white p-12 rounded-lg border-2 border-black text-center">
+          <Image
+            src="/loading.png"
+            alt="Loading details..."
+            width={60}
+            height={60}
+            className="animate-spin mx-auto mb-4"
+          />
+          <p className="text-xl font-semibold">Loading Pokémon data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
+        <div className="bg-white p-12 rounded-lg border-2 border-red-500 text-center">
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-2 text-gray-600 hover:text-black text-2xl font-bold"
+          >
+            ✖
+          </button>
+          <p className="text-xl font-semibold text-red-600">Error</p>
+          <p className="mt-2">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!pokemonData) {
+    return (
+      <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
+        <div className="bg-white p-12 rounded-lg border-2 border-black text-center">
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-2 text-gray-600 hover:text-black text-2xl font-bold"
+          >
+            ✖
+          </button>
+          <p className="text-xl font-semibold">No data available.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-75">
       <div className="bg-white p-12 rounded-lg border-2 border-black relative grid grid-cols-1 sm:grid-cols-[1fr_2fr] w-full max-w-[1300px] max-h-[900px] m-12 overflow-auto gap-6">
