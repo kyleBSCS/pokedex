@@ -16,6 +16,11 @@ export default function Details({
   error,
   onClose,
 }: DetailsProps) {
+  const weaknesses = [
+    { type: "fire", effectiveness: 2 },
+    { type: "water", effectiveness: 0.5 },
+    { type: "electric", effectiveness: 1 },
+  ];
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
@@ -95,7 +100,10 @@ export default function Details({
           {/* Picture */}
           <div className="relative w-full flex justify-center items-center ">
             {/* Background Rectangle */}
-            <div className="absolute w-[205px] h-[205px] sm:w-[150px] sm:h-[150px] lg:w-[205px] lg:h-[205px] bg-lime-300 rounded-4xl"></div>
+            <div
+              className="absolute w-[250px] h-[250px] sm:w-[150px] sm:h-[150px] lg:w-[250px] lg:h-[250px] rounded-4xl"
+              style={{ backgroundColor: getBGColorForType(types[0]) }}
+            ></div>
             {/* Pokémon Image */}
             <Image
               draggable="false"
@@ -111,34 +119,42 @@ export default function Details({
           <div className="font-mono sm:pl-4 mt-1">
             <div className="flex gap-1">
               {types.map((type) => (
-                <h1
-                  className={`font-semibold text-md text-white ${getBGColorForType} px-2 rounded-xl`}
+                <span
+                  key={type}
+                  className={`font-semibold text-xs text-white px-2.5 py-0.5 rounded-full shadow capitalize border-1 border-black mb-2`}
+                  style={{ backgroundColor: getBGColorForType(type) }}
                 >
                   {type}
-                </h1>
+                </span>
               ))}
             </div>
-            <h1 className="text-3xl font-bold mt-1 capitalize">{name}</h1>
-            <h2 className="text-xl font-semibold">{formattedId}</h2>
+            <h1 className="text-5xl font-bold mt-1 capitalize">
+              {name.split("-")[0]}
+            </h1>
+            {name.includes("-") && (
+              <h2 className="text-2xl font-semibold text-gray-500 capitalize">
+                {name.split("-")[1]}
+              </h2>
+            )}
           </div>
 
           {/* Description */}
-          <p className="font-mono font-bold text-gray-700 text-xl tracking-tight sm:pl-4 mt-2">
+          <p className="font-mono font-semibold text-gray-700 text-xl tracking-tight sm:pl-4 mt-2">
             {description}
           </p>
 
           {/* Base Stats */}
           <div className="flex flex-col gap-1 mt-4 sm:pl-4">
-            <h3 className="text-xl lg:text-2xl font-bold mb-2">Base Stats</h3>
+            <h3 className="text-xl lg:text-2xl font-bold mb-2 ">Base Stats</h3>
             {stats.map((stat) => (
               <div
                 key={stat.name}
                 className="grid grid-cols-[max-content_1fr_max-content] gap-2 items-center text-sm lg:text-base"
               >
-                <span className="font-semibold text-gray-600">
+                <span className="font-semibold text-gray-600 text-right w-14">
                   {formatStatName(stat.name)}
                 </span>
-                {/* Basic Progress Bar (Optional but nice) */}
+                {/* Progress Bar */}
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
                     className="h-2.5 rounded-full
@@ -150,9 +166,21 @@ export default function Details({
                   ></div>{" "}
                   {/* Max stat assumed ~255 */}
                 </div>
-                <span className="font-bold text-right w-8">{stat.value}</span>
+                <span className="font-bold text-gray-600 text-right w-8">
+                  {stat.value}
+                </span>
               </div>
             ))}
+
+            <div className="grid grid-cols-[max-content_1fr_max-content] gap-2 items-center text-sm lg:text-base">
+              <span className="font-bold text-gray-800 text-right w-14">
+                TOTAL
+              </span>
+              <div className="w-full "></div>
+              <span className="font-extrabold text-right w-8">
+                {stats.reduce((total, stat) => total + stat.value, 0)}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -184,44 +212,104 @@ export default function Details({
             </div>
           </div>
 
-          {/* Pokedex Data */}
-          <h1 className="text-2xl font-bold">Pokédex Data</h1>
-          <div className="flex w-full gap-4">
-            <div className="flex flex-col gap-2 font-bold text-gray-600">
-              <span>Species</span>
-              <span>Height</span>
-              <span>Weight</span>
-              <span>Abilities</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span>Bug Pokémon</span>
-              <span>1'00"</span>
-              <span>6.4 lbs</span>
-              <span>Shield Dust</span>
+          {/* Weaknesses  */}
+          <div>
+            <h3 className="text-xl lg:text-2xl font-bold mb-2">Weaknesses</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {weaknesses.map((weakness) => (
+                <div
+                  key={weakness.type}
+                  className="flex flex-col items-center justify-center p-4 border-2 border-gray-300 rounded-lg shadow-sm bg-gray-100"
+                >
+                  {/* Type Name */}
+                  <span
+                    className="font-semibold text-white px-3 py-1 rounded-full capitalize mb-2"
+                    style={{
+                      backgroundColor: getBGColorForType(weakness.type),
+                    }}
+                  >
+                    {weakness.type}
+                  </span>
+                  {/* Effectiveness */}
+                  <span className="text-gray-700 font-bold text-lg">
+                    x{weakness.effectiveness}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Pokedex Data */}
-          <h1 className="text-2xl font-bold">Pokédex Data</h1>
-          <div className="flex w-full gap-4">
-            <div className="flex flex-col gap-2 font-bold text-gray-600">
-              <span>Species</span>
-              <span>Height</span>
-              <span>Weight</span>
-              <span>Abilities</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span>Bug Pokémon</span>
-              <span>1'00"</span>
-              <span>6.4 lbs</span>
-              <span>Shield Dust</span>
-            </div>
+          {/* Evolution Chain */}
+          <div className="min-h-0 flex flex-col ">
+            <h3 className="text-xl lg:text-2xl font-bold mb-3">
+              Evolution Chain
+            </h3>
+
+            {evolutionChain && evolutionChain.length > 1 ? (
+              <div className="flex flex-row items-center justify-around gap-2 sm:gap-4 flex-wrap bg-gray-100 rounded-2xl p-2">
+                {evolutionChain.map((stage, index) => (
+                  <div
+                    key={stage.id}
+                    className="flex flex-row items-center gap-2 sm:gap-4"
+                  >
+                    {index > 0 && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13.5 4.5 21 12m0 0L13.5 19.5M21 12H3"
+                        />
+                      </svg>
+                    )}
+
+                    {/* Evolution Stage Card */}
+                    <div className="text-center">
+                      <div
+                        className={`rounded-full p-2 w-24 h-24 sm:w-28 sm:h-28 ${
+                          name === stage.name
+                            ? "lg:w-38 lg:h-38 "
+                            : " lg:w-32 lg:h-32 bg-gray-200 "
+                        } flex items-center justify-center mb-1 hover:bg-gray-200 transition-colors`}
+                        style={{
+                          backgroundColor:
+                            name === stage.name
+                              ? getBGColorForType(types[0])
+                              : undefined,
+                        }}
+                      >
+                        <Image
+                          src={stage.imageUrl}
+                          width={200}
+                          height={200}
+                          alt={stage.name}
+                        />
+                      </div>
+                      <span className="font-semibold capitalize text-sm lg:text-base">
+                        {stage.name}
+                      </span>
+                      <span className="block text-xs text-gray-500">
+                        {formatPokemonId(stage.id)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>{name} does not evolve.</p>
+            )}
           </div>
         </div>
 
         {/* Background Element of ID */}
-        <div className="hidden sm:block absolute bottom-4 right-4 text-6xl text-gray-300 font-bold">
-          #010
+        <div className="hidden sm:block absolute bottom-4 right-4 text-9xl text-gray-300 font-sans ">
+          {formattedId}
         </div>
       </div>
     </div>
