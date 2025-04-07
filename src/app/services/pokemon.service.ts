@@ -12,6 +12,8 @@ import {
   PokeApiEvolutionNode,
   PokemonDetailedViewData,
   EvolutionStage,
+  PokeApiTypeDetailResponse,
+  POKEMON_TYPES,
   MAX_POKEMON_ID,
 } from "@/types/types";
 import { formatPokemonId } from "@/utils/helper";
@@ -223,6 +225,65 @@ async function extractEvolutionStages(
   }
 
   return stages;
+}
+
+// Helper function to calculate weaknesses based on type relations
+async function calculateWeaknesses(
+  pokemonTypes: string[]
+): Promise<Array<{ type: string; effectiveness: number }>> {
+  if (!pokemonTypes || pokemonTypes.length === 0) {
+    return [];
+  }
+
+  // Init multipliers for all possible ATK types
+  const typeEffectiveness: { [key: string]: number } = {};
+  POKEMON_TYPES.forEach((type) => {
+    typeEffectiveness[type] = 1;
+  });
+
+  try {
+    const typeDetailPromises = pokemonTypes.map((type) =>
+      fetch(`${BASE_URL}/type/${type.toLowerCase()}`).then((res) => {
+        if (!res.ok)
+          throw new Error(`Failed to fetch type ${type}:${res.statusText}`);
+        return res.json() as Promise<PokeApiTypeDetailResponse>;
+      })
+    );
+
+    const typeDetails = await Promise.all(typeDetailPromises);
+
+    // Apply multipliers based on fetched relations
+    for (const details of typeDetails) {
+      const relations = details.damage_relations;
+
+      relations.double_damage_from.forEach((typeRel) => {
+        if (typeEffectiveness[typeRel.name] !== undefined) {
+          typeEffectiveness[typeRel.name] *= 2;
+        }
+      });
+      relations.half_damage_from.forEach((typeRel) => {
+        if (typeEffectiveness[typeRel.name] !== undefined) {
+          typeEffectiveness[typeRel.name] *= 0.5;
+        }
+      });
+      relations.no_damage_from.forEach((typeRel) => {
+        if (typeEffectiveness[typeRel.name] !== undefined) {
+          typeEffectiveness[typeRel.name] *= 0;
+        }
+      });
+    }
+
+    // Filter non-weaknesses (effectiveness <= 1) and format result
+    const weaknesses = Object.entries(typeEffectiveness)
+      .filter(([_, effectiveness]) => effectiveness > 1)
+      .map(([type, effectiveness]) => ({ type, effectiveness }))
+      .sort((a, b) => b.effectiveness - a.effectiveness);
+
+    return weaknesses;
+  } catch (e) {
+    console.error("Error calculating weaknesses:", e);
+    return [];
+  }
 }
 
 // =-=-=-=-=-=-= MAIN SERVICE =-=-=-=-=-=-=-=
