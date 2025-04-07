@@ -190,6 +190,22 @@ export default function Home() {
     [fetchPokemon]
   );
 
+  const handleCardClick = useCallback(
+    (id: number) => {
+      console.log(`Card clicked: ${id}`);
+      setSelectedPokemonId(id);
+      fetchPokemonDetails(id);
+    },
+    [fetchPokemonDetails]
+  );
+
+  const handleCloseDetails = useCallback(() => {
+    console.log("Closing details view");
+    setSelectedPokemonId(null);
+    setDetailedPokemonData(null);
+    setDetailError(null);
+  }, []);
+
   // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
   // Initial load
   useEffect(() => {
