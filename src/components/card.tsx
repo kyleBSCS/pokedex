@@ -7,7 +7,13 @@ import { PokemonCardProps } from "@/types/types";
 import { formatPokemonId } from "@/utils/helper";
 import { getBGColorForType } from "@/utils/typeColors";
 
-export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
+export default function Card({
+  id,
+  name,
+  imageUrl,
+  types,
+  onClick,
+}: PokemonCardProps) {
   const [isSelected, setIsSelected] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -51,23 +57,6 @@ export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
     return "initial";
   };
 
-  const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    console.log(`Selected Pokemon: ${name} (ID: ${id})`);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        setIsSelected(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   const primaryType = types[0] || "normal";
   const cardBgColor = getBGColorForType(primaryType);
 
@@ -84,7 +73,7 @@ export default function Card({ id, name, imageUrl, types }: PokemonCardProps) {
         }
       }}
       onHoverEnd={() => setIsHovered(false)}
-      onClick={handleCardClick}
+      onClick={() => onClick?.(id)}
     >
       {/* ID */}
       <h1 className="font-sans text-5xl text-right text-gray-900 tracking-wide pt-4 pr-4">

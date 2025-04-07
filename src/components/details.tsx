@@ -1,4 +1,6 @@
 import { PokemonDetailedViewData } from "@/types/types";
+import { formatPokemonId } from "@/utils/helper";
+import { getBGColorForType } from "@/utils/typeColors";
 import Image from "next/image";
 
 interface DetailsProps {
@@ -64,9 +66,26 @@ export default function Details({
     );
   }
 
+  const {
+    id,
+    name,
+    imageUrl,
+    types,
+    description,
+    stats,
+    species,
+    height,
+    weight,
+    abilities,
+    evolutionChain,
+  } = pokemonData;
+  const formattedId = formatPokemonId(id);
+  const formattedHeight = `${(height / 10).toFixed(1)} m`;
+  const formattedWeight = `${(weight / 10).toFixed(1)} kg`;
+
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-75">
-      <div className="bg-white p-12 rounded-lg border-2 border-black relative grid grid-cols-1 sm:grid-cols-[1fr_2fr] w-full max-w-[1300px] max-h-[900px] m-12 overflow-auto gap-6">
+      <div className="bg-white p-12 rounded-lg border-2 border-black relative grid grid-cols-1 sm:grid-cols-[1fr_2fr] w-full max-w-[1300px] max-h-[900px] m-12 overflow-y-auto gap-6">
         <button className="absolute top-2 right-2 text-gray-600 hover:text-black">
           ✖
         </button>
@@ -80,10 +99,10 @@ export default function Details({
             {/* Pokémon Image */}
             <Image
               draggable="false"
-              src="/010.png"
+              src={imageUrl}
               width={300}
               height={300}
-              alt="Caterpie"
+              alt={name}
               className="relative select-none"
             />
           </div>
@@ -91,15 +110,16 @@ export default function Details({
           {/* Types and Name */}
           <div className="font-mono sm:pl-4 mt-1">
             <div className="flex gap-1">
-              <h1 className="font-semibold text-md text-white bg-red-500 px-2 rounded-xl">
-                Fire
-              </h1>
-              <h1 className="font-semibold text-md text-white bg-green-700 px-2 rounded-xl">
-                Bug
-              </h1>
+              {types.map((type) => (
+                <h1
+                  className={`font-semibold text-md text-white ${getBGColorForType} px-2 rounded-xl`}
+                >
+                  {type}
+                </h1>
+              ))}
             </div>
-            <h1 className="text-3xl font-bold mt-1">Caterpie</h1>
-            <h2 className="text-xl font-semibold">#010</h2>
+            <h1 className="text-3xl font-bold mt-1 capitalize">{name}</h1>
+            <h2 className="text-xl font-semibold">{formattedId}</h2>
           </div>
 
           {/* Description */}

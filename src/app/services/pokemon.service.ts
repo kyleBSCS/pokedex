@@ -150,7 +150,12 @@ async function fetchBasicPokemonDetails(
   id: number | string
 ): Promise<PokemonDetail | null> {
   try {
-    const detailRes = await fetch(`${BASE_URL}/pokemon/${id}}`);
+    const detailRes = await fetch(`${BASE_URL}/pokemon/${id}`, {
+      headers: {
+        "User-Agent": "Pokedex/1.0 (KyleBSCS)",
+      },
+      cache: "no-store",
+    });
 
     if (!detailRes.ok) {
       console.warn(

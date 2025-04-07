@@ -130,6 +130,7 @@ export interface PokemonCardProps {
   name: string;
   imageUrl: string;
   types: string[];
+  onClick?: (id: number) => void;
 }
 
 export interface GetPokemonOptions {

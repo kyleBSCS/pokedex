@@ -277,12 +277,14 @@ export default function Home() {
                 ease: "easeOut",
                 delay: (index % MAX_CARD_PER_BATCH) * 0.05, // Staggered delay for each card
               }}
+              className="cursor-pointer"
             >
               <Card
                 id={pokemon.id}
                 name={pokemon.name}
                 imageUrl={pokemon.imageUrl}
                 types={pokemon.types}
+                onClick={handleCardClick}
               />
             </motion.div>
           ))}
