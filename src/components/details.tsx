@@ -374,8 +374,20 @@ export default function Details({
         </div>
 
         {/* Background Element of ID */}
-        <div className="hidden lg:block absolute top-4 right-6 text-9xl text-gray-300 font-sans">
+        <div className="hidden lg:block absolute top-4 right-6 text-9xl text-gray-300 font-sans pointer-events-none">
           {formattedId}
+        </div>
+
+        {/* Background Picture */}
+        <div className="hidden absolute sm:block bottom-0 right-0 z-0 pointer-events-none overflow-hidden rounded-br-lg">
+          <Image
+            src="/pokeball.svg"
+            alt=""
+            width={500}
+            height={500}
+            objectFit="cover"
+            className="opacity-10 translate-x-1/4 translate-y-1/4 rotate-12"
+          />
         </div>
       </div>
     </div>
