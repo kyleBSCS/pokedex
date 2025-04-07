@@ -12,7 +12,7 @@ import {
   PokeApiEvolutionNode,
   PokemonDetailedViewData,
   EvolutionStage,
-  MAX_POKEMON_ID
+  MAX_POKEMON_ID,
 } from "@/types/types";
 import { formatPokemonId } from "@/utils/helper";
 const BASE_URL = "https://pokeapi.co/api/v2";
@@ -157,36 +157,41 @@ async function fetchBasicPokemonDetails(
         `Failed to fetch details for ID ${id}: ${detailRes.statusText}`
       );
       return null;
-    } 
+    }
 
     // fetch raw data
     const detailData: PokeApiRawPokemonData = await detailRes.json();
 
     return {
-      id: detailData.id;
+      id: detailData.id,
       name: detailData.name,
-      imageUrl:detailData.sprites.other?.["official-artwork"]?.front_default ??
+      imageUrl:
+        detailData.sprites.other?.["official-artwork"]?.front_default ??
         detailData.sprites.other?.dream_world?.front_default ??
         detailData.sprites.front_default ??
         "/placeholder.png",
       types: detailData.types.map((typeInfo: any) => typeInfo.type.name),
       stats: detailData.stats.map((statInfo: any) => ({
         name: statInfo.stat.name,
-        value: statInfo.base_stat
+        value: statInfo.base_stat,
       })),
-      abilities: detailData.abilities.map((abilityInfo: any) => abilityInfo.ability.name),
+      abilities: detailData.abilities.map(
+        (abilityInfo: any) => abilityInfo.ability.name
+      ),
       height: detailData.height,
       weight: detailData.weight,
       speciesUrl: detailData.species.url,
     };
   } catch (e) {
-    console.error(`Error fetching basic details for ID ${id}`, e)
+    console.error(`Error fetching basic details for ID ${id}`, e);
     return null;
   }
 }
 
 // Recursive function to extract evolution stages from the chain data
-async function extractEvolutionStages(node: PokeApiEvolutionNode): Promise<EvolutionStage[]> {
+async function extractEvolutionStages(
+  node: PokeApiEvolutionNode
+): Promise<EvolutionStage[]> {
   let stages: EvolutionStage[] = [];
   const speciesUrl = node.species.url;
   const speciesIdMatch = speciesUrl.match(/\/(\d+)\/?$/);
@@ -201,13 +206,15 @@ async function extractEvolutionStages(node: PokeApiEvolutionNode): Promise<Evolu
     id: speciesId,
     name: node.species.name,
     imageUrl: imageUrl,
-  })
+  });
 
   // Recursively process next evolution stages
   if (node.evolves_to && node.evolves_to.length > 0) {
-    const nestedStagesPromises = node.evolves_to.map(nextNode => extractEvolutionStages(nextNode));
+    const nestedStagesPromises = node.evolves_to.map((nextNode) =>
+      extractEvolutionStages(nextNode)
+    );
     const nestedStagesArray = await Promise.all(nestedStagesPromises);
-    stages = stages.concat(...nestedStagesArray)
+    stages = stages.concat(...nestedStagesArray);
   }
 
   return stages;
@@ -291,41 +298,57 @@ export async function getPokemon(
 }
 
 // For getting detailed view data
-export async function getPokemonDetailsById(id: number | string): Promise<PokemonDetailedViewData | null> {
+export async function getPokemonDetailsById(
+  id: number | string
+): Promise<PokemonDetailedViewData | null> {
   console.log(`Fetching detailed view data for Pokemon ID: ${id}`);
   try {
     // STEP 1: Fetch Basic Pokemon Details (stats, abilities, types, images, speciesUrl, etc.)
     const basicDetails = await fetchBasicPokemonDetails(id);
     if (!basicDetails) {
-      throw new Error (`Could not fetch basic details for Pokemon ${id}`);
+      throw new Error(`Could not fetch basic details for Pokemon ${id}`);
     }
-    
+
     // STEP 2: Fetch Specied Data
     const speciesRes = await fetch(basicDetails.speciesUrl);
     if (!speciesRes.ok) {
-      throw new Error (`Failed to fetch species data ${speciesRes.statusText}`);
+      throw new Error(`Failed to fetch species data ${speciesRes.statusText}`);
     }
     const speciesData: PokeApiSpeciesDetail = await speciesRes.json();
 
-    const genus = speciesData.genera?.find(g => g.language.name === 'en')?.genus ?? 'Unknown Species';
-    const description = speciesData.flavor_text_entries?.find(ft => ft.language.name === 'en')?.flavor_text?.replace(/[\n\f]/g, ' ') ?? 'No description available.';
+    const genus =
+      speciesData.genera?.find((g) => g.language.name === "en")?.genus ??
+      "Unknown Species";
+    const description =
+      speciesData.flavor_text_entries
+        ?.find((ft) => ft.language.name === "en")
+        ?.flavor_text?.replace(/[\n\f]/g, " ") ?? "No description available.";
 
     // STEP 3: Fetch Evolution Chain Data
     const evolutionChainUrl = speciesData.evolution_chain.url;
     const evolutionRes = await fetch(evolutionChainUrl);
     if (!evolutionRes.ok) {
-      throw new Error(`Failed to fetch evolution chain: ${evolutionRes.statusText}`);
+      throw new Error(
+        `Failed to fetch evolution chain: ${evolutionRes.statusText}`
+      );
     }
     const evolutionData: PokeApiEvolutionChain = await evolutionRes.json();
 
-
     // STEP 4: Process Evolution Chain to get names, IDs, and images
-    const evolutionStages = await extractEvol
+    const evolutionStages = await extractEvolutionStages(evolutionData.chain);
 
     // STEP 5: Combine all data
-    
+    const detailedData: PokemonDetailedViewData = {
+      ...basicDetails,
+      species: genus,
+      description: description,
+      evolutionChain: evolutionStages,
+    };
+
+    console.log(`Successfully fetched detailed data for ${detailedData.name}`);
+    return detailedData;
   } catch (e: any) {
-    console.error( `Error in getPokemonDetailsById for ID ${id}`, e);
+    console.error(`Error in getPokemonDetailsById for ID ${id}`, e);
     return null;
   }
 }
