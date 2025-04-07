@@ -2,12 +2,17 @@ import { PokemonDetailedViewData } from "@/types/types";
 import { formatPokemonId, formatStatName } from "@/utils/helper";
 import { getBGColorForType } from "@/utils/typeColors";
 import Image from "next/image";
+import { useRef } from "react";
 
 interface DetailsProps {
   pokemonData: PokemonDetailedViewData | null;
   isLoading: boolean;
   error: string | null;
   onClose: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  isFirst: boolean;
+  isLast: boolean;
 }
 
 export default function Details({
@@ -15,7 +20,20 @@ export default function Details({
   isLoading,
   error,
   onClose,
+  onPrevious,
+  onNext,
+  isFirst,
+  isLast,
 }: DetailsProps) {
+  const modalContentRef = useRef<HTMLDivElement>(null);
+
+  const handleBackdropClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      onClose();
+    }
+  };
+
+  // Loading State
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
@@ -33,6 +51,7 @@ export default function Details({
     );
   }
 
+  // Error State
   if (error) {
     return (
       <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
@@ -50,6 +69,7 @@ export default function Details({
     );
   }
 
+  // Empty State
   if (!pokemonData) {
     return (
       <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
@@ -85,9 +105,20 @@ export default function Details({
   const formattedWeight = `${(weight / 10).toFixed(1)} kg`;
 
   return (
-    <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-75">
-      <div className="bg-white p-12 rounded-lg border-2 border-black relative grid grid-cols-1 sm:grid-cols-[1fr_2fr] w-full max-w-[1300px] max-h-[900px] m-12 overflow-y-auto gap-6">
-        <button className="absolute top-2 right-2 text-gray-600 hover:text-black">
+    <div
+      className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-75"
+      onClick={handleBackdropClick}
+    >
+      <div
+        className="bg-white p-12 rounded-lg border-2 border-black relative grid grid-cols-1 sm:grid-cols-[1fr_2fr] w-full max-w-[1300px] max-h-[900px] m-12 overflow-y-auto gap-6"
+        ref={modalContentRef}
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          aria-label="Close details"
+          className="absolute top-2 right-2 text-gray-600 hover:text-black text-2xl font-bold z-30"
+        >
           ✖
         </button>
 
@@ -307,14 +338,68 @@ export default function Details({
               <p>{name} does not evolve.</p>
             )}
           </div>
+
+          {/* Previous & Next Buttons */}
+
+          <div className="flex w-full items-center gap-4 justify-center ">
+            {" "}
+            <button
+              onClick={onPrevious}
+              disabled={isFirst}
+              aria-label="Previous Pokémon"
+              className={` p-2 rounded-full bg-white border border-black ${
+                isFirst
+                  ? "opacity-50 cursor-not-allowed hover:bg-white/80"
+                  : "cursor-pointer"
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 19.5 8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={onNext}
+              disabled={isLast}
+              aria-label="Next Pokémon"
+              className={`p-2 rounded-full bg-white border border-black ${
+                isLast
+                  ? "opacity-50 cursor-not-allowed hover:bg-white/80"
+                  : "cursor-pointer"
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Background Element of ID */}
         <div className="hidden lg:block absolute top-4 right-6 text-9xl text-gray-300 font-sans">
           {formattedId}
         </div>
-
-        {/* Previous & Next Buttons */}
       </div>
     </div>
   );

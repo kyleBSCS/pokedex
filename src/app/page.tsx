@@ -268,6 +268,17 @@ export default function Home() {
     };
   }, [fetchPokemon, hasMore, isLoading, pokemonList]);
 
+  // --- Navigation Button States ---
+  const currentPokemonIndex =
+    selectedPokemonId !== null
+      ? pokemonList.findIndex((p) => p.id === selectedPokemonId)
+      : -1;
+  const isFirstPokemon = currentPokemonIndex === 0;
+  const isLastPokemon = currentPokemonIndex === pokemonList.length - 1;
+
+  // Handle case where pokemonList is empty or ID not found (index is -1)
+  const canNavigate = pokemonList.length > 0 && currentPokemonIndex !== -1;
+
   return (
     <div className="font-mono relative">
       <div className=" mx-auto mt-12 flex flex-col md:flex-row justify-center">
@@ -349,6 +360,10 @@ export default function Home() {
           isLoading={isDetailLoading}
           error={detailError}
           onClose={handleCloseDetails}
+          onPrevious={handlePreviousPokemon}
+          onNext={handleNextPokemon}
+          isFirst={!canNavigate || isFirstPokemon}
+          isLast={!canNavigate || isLastPokemon}
         />
       )}
 
