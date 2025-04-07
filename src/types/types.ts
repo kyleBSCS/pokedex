@@ -202,6 +202,8 @@ export interface PokemonDetailedViewData extends PokemonDetail {
   evolutionChain: EvolutionStage[];
 }
 
+export interface ApiPokemonDetailResponse extends PokemonDetailedViewData {}
+
 // What is returned in our service layer
 export interface ApiPokemonResponse {
   count: number;

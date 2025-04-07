@@ -9,9 +9,12 @@ import {
   PokemonCardProps,
   SortByType,
   AppliedFilters,
+  PokemonDetailedViewData,
+  ApiPokemonDetailResponse,
 } from "@/types/types";
 import Card from "@/components/card";
 import FilterBox from "@/components/filterbox";
+import Details from "@/components/details";
 
 const loadingQuotes = [
   "Fetching data... it's super effective!",
@@ -39,6 +42,15 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
+
+  // States for the Detailed View
+  const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(
+    null
+  );
+  const [detailedPokemonData, setDetailedPokemonData] =
+    useState<PokemonDetailedViewData | null>(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
 
   // For the trigger that loads more cards
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -133,6 +145,38 @@ export default function Home() {
       }
     },
     [offset, searchTerm, selectedTypes, sortBy]
+  );
+
+  const fetchPokemonDetails = useCallback(
+    async (id: number) => {
+      if (isDetailLoading) return;
+
+      console.log(`Fetching details for Pokemon id ${id}`);
+      setIsDetailLoading(true);
+      setDetailedPokemonData(null);
+      setDetailError(null);
+
+      try {
+        const res = await fetch(`/api/pokemon/${id}`);
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.message || `API Error: ${res.statusText}`);
+        }
+
+        const data: ApiPokemonDetailResponse = await res.json();
+        setDetailedPokemonData(data);
+      } catch (e: any) {
+        console.error(`Failed to fetch details for Pokemon ${id}`);
+        setDetailError(
+          `Failed to load details ${e.message}. Please try again!`
+        );
+      } finally {
+        setIsDetailLoading(false);
+        console.log(`Detail fetch for id ${id} has been completed`);
+      }
+    },
+    [isDetailLoading]
   );
 
   // =-=-=-=-=-= HANDLER =-=-=-=-=-=
