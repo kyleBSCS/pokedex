@@ -295,7 +295,7 @@ export default function Details({
             </h3>
 
             {evolutionChain && evolutionChain.length > 1 ? (
-              <div className="flex flex-col lg:flex-row items-center justify-around gap-2 flex-wrap lg:flex-nowrap bg-gray-100 rounded-2xl p-2 z-10">
+              <div className="flex flex-col lg:flex-row items-center justify-around gap-2 flex-wrap lg:flex-nowrap bg-gray-100 rounded-2xl border border-black p-2 z-10">
                 {evolutionChain.map((stage, index) => (
                   <div
                     key={stage.id}
@@ -338,7 +338,11 @@ export default function Details({
                 ))}
               </div>
             ) : (
-              <p>{name} does not evolve.</p>
+              <div className="flex flex-col lg:flex-row items-center justify-around gap-2 flex-wrap lg:flex-nowrap bg-gray-100 rounded-2xl p-2 z-10">
+                <p className="text-center capitalize">
+                  {name.split("-")[0]} does not evolve.
+                </p>
+              </div>
             )}
           </div>
 

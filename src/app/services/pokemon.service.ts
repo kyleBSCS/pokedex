@@ -127,7 +127,7 @@ async function getPokemonDetails(
           detail.sprites.other?.["official-artwork"]?.front_default ??
           detail.sprites.other?.dream_world?.front_default ??
           detail.sprites.front_default ??
-          "/fallback.png", // fallback
+          "/fallback.webp", // fallback
         types: detail.types.map((typeInfo) => typeInfo.type.name),
       };
     } catch (detailError) {
@@ -176,7 +176,7 @@ async function fetchBasicPokemonDetails(
         detailData.sprites.other?.["official-artwork"]?.front_default ??
         detailData.sprites.other?.dream_world?.front_default ??
         detailData.sprites.front_default ??
-        "/placeholder.png",
+        "/fallback.webp",
       types: detailData.types.map((typeInfo: any) => typeInfo.type.name),
       stats: detailData.stats.map((statInfo: any) => ({
         name: statInfo.stat.name,
