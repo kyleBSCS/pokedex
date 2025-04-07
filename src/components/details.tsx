@@ -16,11 +16,6 @@ export default function Details({
   error,
   onClose,
 }: DetailsProps) {
-  const weaknesses = [
-    { type: "fire", effectiveness: 2 },
-    { type: "water", effectiveness: 0.5 },
-    { type: "electric", effectiveness: 1 },
-  ];
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
@@ -83,6 +78,7 @@ export default function Details({
     weight,
     abilities,
     evolutionChain,
+    weaknesses,
   } = pokemonData;
   const formattedId = formatPokemonId(id);
   const formattedHeight = `${(height / 10).toFixed(1)} m`;
@@ -214,16 +210,22 @@ export default function Details({
 
           {/* Weaknesses  */}
           <div>
-            <h3 className="text-xl lg:text-2xl font-bold mb-2">Weaknesses</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <h3 className="text-xl lg:text-2xl font-bold">Weaknesses</h3>
+            <p className="mb-4 text-gray-800">
+              These types will be effective against{" "}
+              {name.split("-")[0].charAt(0).toUpperCase() +
+                name.split("-")[0].slice(1)}
+              .
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {weaknesses.map((weakness) => (
                 <div
                   key={weakness.type}
-                  className="flex flex-col items-center justify-center p-4 border-2 border-gray-300 rounded-lg shadow-sm bg-gray-100"
+                  className="flex flex-col items-center justify-center p-2 border border-black rounded-lg shadow-sm bg-gray-50 text-center"
                 >
                   {/* Type Name */}
                   <span
-                    className="font-semibold text-white px-3 py-1 rounded-full capitalize mb-2"
+                    className="font-semibold text-white px-2.5 py-0.5 rounded-full capitalize mb-1"
                     style={{
                       backgroundColor: getBGColorForType(weakness.type),
                     }}
@@ -231,8 +233,8 @@ export default function Details({
                     {weakness.type}
                   </span>
                   {/* Effectiveness */}
-                  <span className="text-gray-700 font-bold text-lg">
-                    x{weakness.effectiveness}
+                  <span className="text-gray-600 font-bold text-sm text-center">
+                    {weakness.effectiveness}x
                   </span>
                 </div>
               ))}
@@ -246,7 +248,7 @@ export default function Details({
             </h3>
 
             {evolutionChain && evolutionChain.length > 1 ? (
-              <div className="flex flex-row items-center justify-around gap-2 sm:gap-4 flex-wrap bg-gray-100 rounded-2xl p-2">
+              <div className="flex flex-row items-center justify-around gap-2 sm:gap-4 flex-wrap bg-gray-100 rounded-2xl p-2 z-10">
                 {evolutionChain.map((stage, index) => (
                   <div
                     key={stage.id}
@@ -308,7 +310,7 @@ export default function Details({
         </div>
 
         {/* Background Element of ID */}
-        <div className="hidden sm:block absolute bottom-4 right-4 text-9xl text-gray-300 font-sans ">
+        <div className="hidden lg:block absolute top-4 right-6 text-9xl text-gray-300 font-sans">
           {formattedId}
         </div>
       </div>
