@@ -268,19 +268,15 @@ export default function Details({
               {weaknesses.map((weakness) => (
                 <div
                   key={weakness.type}
-                  className="flex flex-col items-center justify-center p-2 border border-black rounded-lg shadow-sm bg-gray-50 text-center"
+                  className={`flex flex-col items-center justify-center p-2 border border-black rounded-lg shadow-sm text-center`}
+                  style={{ backgroundColor: getBGColorForType(weakness.type) }}
                 >
                   {/* Type Name */}
-                  <span
-                    className="font-semibold text-white px-2.5 py-0.5 rounded-full capitalize mb-1"
-                    style={{
-                      backgroundColor: getBGColorForType(weakness.type),
-                    }}
-                  >
+                  <span className="font-semibold text-black px-2.5 py-0.5 rounded-full capitalize mb-1 bg-white">
                     {weakness.type}
                   </span>
                   {/* Effectiveness */}
-                  <span className="text-gray-600 font-bold text-sm text-center">
+                  <span className="text-white font-bold text-md text-center ">
                     {weakness.effectiveness}x
                   </span>
                 </div>
