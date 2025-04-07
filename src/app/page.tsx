@@ -206,6 +206,32 @@ export default function Home() {
     setDetailError(null);
   }, []);
 
+  const handlePreviousPokemon = useCallback(() => {
+    if (!selectedPokemonId || pokemonList.length === 0) return;
+
+    const currentIndex = pokemonList.findIndex(
+      (p) => p.id === selectedPokemonId
+    );
+    if (currentIndex > 0) {
+      const previousPokemonId = pokemonList[currentIndex - 1].id;
+      setSelectedPokemonId(previousPokemonId);
+      fetchPokemonDetails(previousPokemonId);
+    }
+  }, [selectedPokemonId, pokemonList, fetchPokemonDetails]);
+
+  const handleNextPokemon = useCallback(() => {
+    if (!selectedPokemonId || pokemonList.length === 0) return;
+
+    const currentIndex = pokemonList.findIndex(
+      (p) => p.id === selectedPokemonId
+    );
+    if (currentIndex !== -1 && currentIndex < pokemonList.length - 1) {
+      const nextPokemonId = pokemonList[currentIndex + 1].id;
+      setSelectedPokemonId(nextPokemonId);
+      fetchPokemonDetails(nextPokemonId);
+    }
+  }, [selectedPokemonId, pokemonList, fetchPokemonDetails]);
+
   // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
   // Initial load
   useEffect(() => {

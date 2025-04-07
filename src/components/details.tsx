@@ -313,6 +313,8 @@ export default function Details({
         <div className="hidden lg:block absolute top-4 right-6 text-9xl text-gray-300 font-sans">
           {formattedId}
         </div>
+
+        {/* Previous & Next Buttons */}
       </div>
     </div>
   );
