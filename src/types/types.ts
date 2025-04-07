@@ -91,7 +91,7 @@ export interface PokeApiSpeciesDetail {
   varieties: Array<{ is_default: boolean; pokemon: PokeApiResource }>;
 }
 
-interface PokeApiEvolutionNode {
+export interface PokeApiEvolutionNode {
   species: PokeApiResource;
   evolves_to: PokeApiEvolutionNode[];
   is_baby: boolean;
@@ -174,12 +174,6 @@ export interface PokeApiRawPokemonData {
   height: number;
   weight: number;
   species: { name: string; url: string };
-}
-
-interface PokeApiEvolutionNode {
-  species: PokeApiResource;
-  evolves_to: PokeApiEvolutionNode[];
-  is_baby: boolean;
 }
 
 export interface PokeApiEvolutionChain {
