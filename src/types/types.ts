@@ -2,7 +2,6 @@
 // Structure of the JSON for the details of a pokemon
 
 export const MAX_POKEMON_ID = 1302;
-export type SortByType = "id_asc" | "id_desc" | "name_asc" | "name_desc";
 export const POKEMON_TYPES = [
   "grass",
   "fire",
@@ -23,6 +22,8 @@ export const POKEMON_TYPES = [
   "ice",
   "fighting",
 ];
+
+export type SortByType = "id_asc" | "id_desc" | "name_asc" | "name_desc";
 
 interface PokeApiStat {
   base_stat: number;
@@ -201,9 +202,31 @@ export interface PokemonDetailedViewData extends PokemonDetail {
   species: string;
   description: string;
   evolutionChain: EvolutionStage[];
+  weaknesses: Array<{ type: string; effectiveness: number }>;
 }
 
 export interface ApiPokemonDetailResponse extends PokemonDetailedViewData {}
+
+interface TypeRelation {
+  name: string;
+  url: string;
+}
+
+interface TypeRelations {
+  no_damage_to: TypeRelation[];
+  half_damage_to: TypeRelation[];
+  double_damage_to: TypeRelation[];
+  no_damage_from: TypeRelation[];
+  half_damage_from: TypeRelation[];
+  double_damage_from: TypeRelation[];
+}
+
+export interface PokeApiTypeDetailResponse {
+  id: number;
+  name: string;
+  damage_relations: TypeRelations;
+  pokemon: Array<{ pokemon: PokeApiResource; slot: number }>;
+}
 
 // What is returned in our service layer
 export interface ApiPokemonResponse {
