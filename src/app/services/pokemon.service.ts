@@ -403,12 +403,16 @@ export async function getPokemonDetailsById(
     // STEP 4: Process Evolution Chain to get names, IDs, and images
     const evolutionStages = await extractEvolutionStages(evolutionData.chain);
 
+    // STEP 5: Calculatge weaknesses using types
+    const weaknesses = await calculateWeaknesses(basicDetails.types);
+
     // STEP 5: Combine all data
     const detailedData: PokemonDetailedViewData = {
       ...basicDetails,
       species: genus,
       description: description,
       evolutionChain: evolutionStages,
+      weaknesses: weaknesses,
     };
 
     console.log(`Successfully fetched detailed data for ${detailedData.name}`);
