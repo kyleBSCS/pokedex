@@ -28,17 +28,20 @@ export default function Details({
 }: DetailsProps) {
   const modalContentRef = useRef<HTMLDivElement>(null);
 
-  const handleBackdropClick = (event: MouseEvent<HTMLDivElement>) => {
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) {
       onClose();
     }
   };
 
-  // Loading State
+  // Loading state
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
-        <div className="bg-white p-12 rounded-lg border-2 border-black text-center">
+      <div
+        className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-75"
+        onClick={handleBackdropClick}
+      >
+        <div className="bg-white p-12 rounded-lg border-2 border-black relative flex items-center justify-center flex-col w-full max-w-[1300px] h-[300px] m-12 overflow-y-auto gap-6">
           <Image
             src="/loading.png"
             alt="Loading details..."
@@ -46,42 +49,54 @@ export default function Details({
             height={60}
             className="animate-spin mx-auto mb-4"
           />
-          <p className="text-xl font-semibold">Loading Pokémon data...</p>
+          <p className="text-xl font-semibold text-center">
+            Loading Pokémon data...
+          </p>
         </div>
       </div>
     );
   }
 
-  // Error State
+  // Error state
   if (error) {
     return (
-      <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
-        <div className="bg-white p-12 rounded-lg border-2 border-red-500 text-center">
+      <div
+        className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-75"
+        onClick={handleBackdropClick}
+      >
+        <div className="bg-white p-12 rounded-lg border-2 border-black relative grid grid-cols-1 sm:grid-cols-[1fr_2fr] w-full max-w-[1300px] max-h-[900px] m-12 overflow-y-auto gap-6">
           <button
             onClick={onClose}
             className="absolute top-2 right-2 text-gray-600 hover:text-black text-2xl font-bold"
           >
             ✖
           </button>
-          <p className="text-xl font-semibold text-red-600">Error</p>
-          <p className="mt-2">{error}</p>
+          <p className="text-xl font-semibold text-red-600 text-center">
+            Error
+          </p>
+          <p className="mt-2 text-center">{error}</p>
         </div>
       </div>
     );
   }
 
-  // Empty State
+  // No data state
   if (!pokemonData) {
     return (
-      <div className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-50">
-        <div className="bg-white p-12 rounded-lg border-2 border-black text-center">
+      <div
+        className="fixed inset-0 z-20 flex items-center justify-center w-full h-full backdrop-brightness-75"
+        onClick={handleBackdropClick}
+      >
+        <div className="bg-white p-12 rounded-lg border-2 border-black relative grid grid-cols-1 sm:grid-cols-[1fr_2fr] w-full max-w-[1300px] max-h-[900px] m-12 overflow-y-auto gap-6">
           <button
             onClick={onClose}
             className="absolute top-2 right-2 text-gray-600 hover:text-black text-2xl font-bold"
           >
             ✖
           </button>
-          <p className="text-xl font-semibold">No data available.</p>
+          <p className="text-xl font-semibold text-center">
+            No data available.
+          </p>
         </div>
       </div>
     );
@@ -280,11 +295,11 @@ export default function Details({
             </h3>
 
             {evolutionChain && evolutionChain.length > 1 ? (
-              <div className="flex flex-col lg:flex-row items-center justify-around gap-2 lg:gap-4 flex-wrap lg:flex-nowrap bg-gray-100 rounded-2xl p-2 z-10">
+              <div className="flex flex-col lg:flex-row items-center justify-around gap-2 flex-wrap lg:flex-nowrap bg-gray-100 rounded-2xl p-2 z-10">
                 {evolutionChain.map((stage, index) => (
                   <div
                     key={stage.id}
-                    className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4 whitespace-nowrap"
+                    className="flex flex-col lg:flex-row items-center gap-2 md:gap-6 lg:gap-8 whitespace-nowrap px-auto"
                   >
                     {index > 0 && (
                       <ArrowRight className="transform rotate-90 lg:rotate-0 transition-transform duration-150" />
