@@ -280,13 +280,15 @@ export default function Details({
             </h3>
 
             {evolutionChain && evolutionChain.length > 1 ? (
-              <div className="flex flex-row items-center justify-around gap-2 sm:gap-4 flex-wrap bg-gray-100 rounded-2xl p-2 z-10">
+              <div className="flex flex-col lg:flex-row items-center justify-around gap-2 lg:gap-4 flex-wrap lg:flex-nowrap bg-gray-100 rounded-2xl p-2 z-10">
                 {evolutionChain.map((stage, index) => (
                   <div
                     key={stage.id}
-                    className="flex flex-row items-center gap-2 sm:gap-4"
+                    className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4 whitespace-nowrap"
                   >
-                    {index > 0 && <ArrowRight />}
+                    {index > 0 && (
+                      <ArrowRight className="transform rotate-90 lg:rotate-0 transition-transform duration-150" />
+                    )}
 
                     {/* Evolution Stage Card */}
                     <div className="text-center">
