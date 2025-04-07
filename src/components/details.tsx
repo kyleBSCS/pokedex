@@ -1,6 +1,7 @@
 import { PokemonDetailedViewData } from "@/types/types";
 import { formatPokemonId, formatStatName } from "@/utils/helper";
 import { getBGColorForType } from "@/utils/typeColors";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useRef } from "react";
 
@@ -285,22 +286,7 @@ export default function Details({
                     key={stage.id}
                     className="flex flex-row items-center gap-2 sm:gap-4"
                   >
-                    {index > 0 && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M13.5 4.5 21 12m0 0L13.5 19.5M21 12H3"
-                        />
-                      </svg>
-                    )}
+                    {index > 0 && <ArrowRight />}
 
                     {/* Evolution Stage Card */}
                     <div className="text-center">
@@ -353,20 +339,7 @@ export default function Details({
                   : "cursor-pointer"
               }`}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 19.5 8.25 12l7.5-7.5"
-                />
-              </svg>
+              <ChevronLeft />
             </button>
             <button
               onClick={onNext}
@@ -378,20 +351,7 @@ export default function Details({
                   : "cursor-pointer"
               }`}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                />
-              </svg>
+              <ChevronRight />
             </button>
           </div>
         </div>
