@@ -7,7 +7,6 @@ import {
   FilterBoxProps,
   SortByType,
   AppliedFilters,
-  MAX_POKEMON_ID,
 } from "@/types/types";
 
 export default function FilterBox({
@@ -184,7 +183,7 @@ export default function FilterBox({
               <div className="place-self-end">
                 <button
                   onClick={handleApplyClick}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-7 px-4 rounded-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-lg justify-self"
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-7 px-4 rounded-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-lg justify-self"
                 >
                   Apply Filters
                 </button>

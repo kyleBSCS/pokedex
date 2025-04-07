@@ -232,7 +232,7 @@ export default function Home() {
       {/* Status Messages */}
       <div
         ref={observerRef}
-        className="h-20 flex justify-center sm:justify-start sm:pl-4 sm:pb-4 items-center w-full text-center"
+        className="h-20 flex justify-center sm:justify-start sm:pl-12 sm:pb-6 items-center w-full text-center"
       >
         {isLoading && (
           <div className="flex gap-2 items-center justify-center">

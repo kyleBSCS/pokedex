@@ -2,7 +2,6 @@ import {
   MAX_POKEMON_ID,
   PokemonCardProps,
   PokemonDetail,
-  SortByType,
   PokeApiResource,
   PokeApiPokemonListResponse,
   PokeApiTypeResponse,
@@ -119,7 +118,7 @@ async function getPokemonDetails(
           detail.sprites.other?.["official-artwork"]?.front_default ??
           detail.sprites.other?.dream_world?.front_default ??
           detail.sprites.front_default ??
-          "/pokeball.svg", // fallback
+          "/fallback.png", // fallback
         types: detail.types.map((typeInfo) => typeInfo.type.name),
       };
     } catch (detailError) {
