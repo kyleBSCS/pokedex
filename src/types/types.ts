@@ -22,6 +22,14 @@ export const POKEMON_TYPES = [
   "ice",
   "fighting",
 ];
+export const loadingQuotes = [
+  "Fetching data... it's super effective!",
+  "Your content is evolving!",
+  "This might take a Potion or two...",
+  "Snorlax is in the way...",
+  "Passing by tall grass...",
+  "Trying to avoid wild encounters...",
+];
 
 export type SortByType = "id_asc" | "id_desc" | "name_asc" | "name_desc";
 

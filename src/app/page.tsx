@@ -11,19 +11,11 @@ import {
   AppliedFilters,
   PokemonDetailedViewData,
   ApiPokemonDetailResponse,
+  loadingQuotes,
 } from "@/types/types";
 import Card from "@/components/card";
 import FilterBox from "@/components/filterbox";
 import Details from "@/components/details";
-
-const loadingQuotes = [
-  "Fetching data... it's super effective!",
-  "Your content is evolving!",
-  "This might take a Potion or two...",
-  "Snorlax is in the way...",
-  "Passing by tall grass...",
-  "Trying to avoid wild encounters...",
-];
 
 // Limits how many pokemon cards to fetch per batch
 /* 
@@ -331,7 +323,7 @@ export default function Home() {
       {/* Status Messages */}
       <div
         ref={observerRef}
-        className="h-20 flex justify-center sm:justify-start sm:pl-12 sm:pb-6 items-center w-full text-center"
+        className="h-20 flex justify-center sm:justify-start sm:pl-14 sm:pb-6 items-center w-full text-center"
       >
         {isLoading && (
           <div className="flex gap-2 items-center justify-center">
@@ -349,6 +341,12 @@ export default function Home() {
         )}
         {!isLoading && !hasMore && pokemonList.length > 0 && (
           <p className="text-white font-bold text-2xl">-- End of List --</p>
+        )}
+
+        {!isLoading && !hasMore && pokemonList.length === 0 && (
+          <p className="text-white font-bold text-2xl sm:pl-12">
+            Hmm... Nothing here!
+          </p>
         )}
         {error && <p className="text-white font-semibold p-4">{error}</p>}
       </div>

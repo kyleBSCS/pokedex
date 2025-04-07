@@ -1,4 +1,4 @@
-import { PokemonDetailedViewData } from "@/types/types";
+import { PokemonDetailedViewData, loadingQuotes } from "@/types/types";
 import { formatPokemonId, formatStatName } from "@/utils/helper";
 import { getBGColorForType } from "@/utils/typeColors";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
@@ -27,6 +27,8 @@ export default function Details({
   isLast,
 }: DetailsProps) {
   const modalContentRef = useRef<HTMLDivElement>(null);
+  const randomQuote =
+    loadingQuotes[Math.floor(Math.random() * loadingQuotes.length)];
 
   const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) {
@@ -49,9 +51,7 @@ export default function Details({
             height={60}
             className="animate-spin mx-auto mb-4"
           />
-          <p className="text-xl font-semibold text-center">
-            Loading Pokémon data...
-          </p>
+          <p className="text-xl font-semibold text-center">{randomQuote}</p>
         </div>
       </div>
     );
