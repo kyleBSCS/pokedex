@@ -13,6 +13,7 @@ export default function Card({
   imageUrl,
   types,
   onClick,
+  selectedPokemonId,
 }: PokemonCardProps) {
   const [isSelected, setIsSelected] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -39,16 +40,19 @@ export default function Card({
 
     // State of the card when selected
     selected: {
-      y: [-5, -10, -50],
+      y: [-5, -10, -100],
       opacity: [1, 1, 0],
       scale: [1.0, 1.1, 1.1],
       transition: { duration: 0.4, ease: "easeInOut", times: [0, 0.5, 1] },
     },
   };
 
+  // Determine this card is selected
+  const isThisCardSelected = selectedPokemonId === id;
+
   // Target animation based on state
   const getTargetAnimation = () => {
-    if (isSelected) {
+    if (isThisCardSelected) {
       return "selected";
     }
     if (isHovered) {
@@ -68,7 +72,7 @@ export default function Card({
       initial="initial"
       animate={getTargetAnimation()}
       onHoverStart={() => {
-        if (!isSelected) {
+        if (!isThisCardSelected) {
           setIsHovered(true);
         }
       }}

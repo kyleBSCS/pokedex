@@ -314,6 +314,7 @@ export default function Home() {
                 imageUrl={pokemon.imageUrl}
                 types={pokemon.types}
                 onClick={handleCardClick}
+                selectedPokemonId={selectedPokemonId}
               />
             </motion.div>
           ))}
