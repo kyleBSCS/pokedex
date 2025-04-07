@@ -24,29 +24,6 @@ export const POKEMON_TYPES = [
   "fighting",
 ];
 
-export interface PokemonDetail {
-  id: number;
-  name: string;
-  sprites: {
-    other?: {
-      dream_world?: {
-        front_default: string | null;
-      };
-      "official-artwork"?: {
-        front_default: string | null;
-      };
-    };
-    front_default: string | null;
-  };
-  types: Array<{
-    slot: number;
-    type: {
-      name: string;
-      url: string;
-    };
-  }>;
-}
-
 interface PokeApiStat {
   base_stat: number;
   effort: number;
@@ -161,6 +138,74 @@ export interface GetPokemonOptions {
   search?: string;
   types?: string[];
   sort?: SortByType;
+}
+
+export interface PokeApiRawPokemonData {
+  id: number;
+  name: string;
+  sprites: {
+    other?: {
+      dream_world?: {
+        front_default: string | null;
+      };
+      "official-artwork"?: {
+        front_default: string | null;
+      };
+    };
+    front_default: string | null;
+  };
+  types: Array<{
+    slot: number;
+    type: {
+      name: string;
+      url: string;
+    };
+  }>;
+  stats: Array<{
+    base_stat: number;
+    effort: number;
+    stat: { name: string; url: string };
+  }>;
+  abilities: Array<{
+    ability: { name: string; url: string };
+    is_hidden: boolean;
+    slot: number;
+  }>;
+  height: number;
+  weight: number;
+  species: { name: string; url: string };
+}
+
+interface PokeApiEvolutionNode {
+  species: PokeApiResource;
+  evolves_to: PokeApiEvolutionNode[];
+  is_baby: boolean;
+}
+
+export interface PokeApiEvolutionChain {
+  id: number;
+  baby_trigger_item: any;
+  chain: PokeApiEvolutionNode;
+}
+
+export interface EvolutionStage {
+  id: number;
+  name: string;
+  imageUrl: string;
+}
+
+export interface PokemonDetail extends PokemonCardProps {
+  stats: Array<{ name: string; value: number }>;
+  abilities: string[];
+  height: number;
+  weight: number;
+  speciesUrl: string;
+}
+
+export interface PokemonDetailedViewData extends PokemonDetail {
+  species: string;
+  description: string;
+  evolutionChain: EvolutionStage[];
 }
 
 // What is returned in our service layer

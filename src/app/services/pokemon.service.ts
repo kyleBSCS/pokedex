@@ -1,14 +1,19 @@
 import {
-  MAX_POKEMON_ID,
   PokemonCardProps,
   PokemonDetail,
+  SortByType,
   PokeApiResource,
   PokeApiPokemonListResponse,
   PokeApiTypeResponse,
   GetPokemonOptions,
+  PokeApiRawPokemonData,
+  PokeApiSpeciesDetail,
+  PokeApiEvolutionChain,
+  PokemonDetailedViewData,
+  EvolutionStage,
+  MAX_POKEMON_ID
 } from "@/types/types";
 import { formatPokemonId } from "@/utils/helper";
-
 const BASE_URL = "https://pokeapi.co/api/v2";
 
 // =-=-=-=-=-=-= CACHE =-=-=-=-=-=-=-=
@@ -110,7 +115,8 @@ async function getPokemonDetails(
         );
         return null; // Skip this Pokemon if details fail
       }
-      const detail: PokemonDetail = await detailRes.json();
+
+      const detail: PokeApiRawPokemonData = await detailRes.json();
       return {
         id: detail.id,
         name: detail.name,
@@ -131,12 +137,51 @@ async function getPokemonDetails(
   });
 
   const detailedResults = await Promise.all(detailPromises);
-
   const filteredResults = detailedResults.filter(
     (p): p is PokemonCardProps => p !== null
   );
   console.log(`Filtered detailed results count: ${filteredResults.length}`);
   return filteredResults;
+}
+
+// Fetches basic details for a single Pokemon ID
+async function fetchBasicPokemonDetails(
+  id: number | string
+): Promise<PokemonDetail | null> {
+  try {
+    const detailRes = await fetch(`${BASE_URL}/pokemon/${id}}`);
+
+    if (!detailRes.ok) {
+      console.warn(
+        `Failed to fetch details for ID ${id}: ${detailRes.statusText}`
+      );
+      return null;
+    } 
+
+    // fetch raw data
+    const detailData: PokeApiRawPokemonData = await detailRes.json();
+
+    return {
+      id: detailData.id;
+      name: detailData.name,
+      imageUrl:detailData.sprites.other?.["official-artwork"]?.front_default ??
+        detailData.sprites.other?.dream_world?.front_default ??
+        detailData.sprites.front_default ??
+        "/placeholder.png",
+      types: detailData.types.map((typeInfo: any) => typeInfo.type.name),
+      stats: detailData.stats.map((statInfo: any) => ({
+        name: statInfo.stat.name,
+        value: statInfo.base_stat
+      })),
+      abilities: detailData.abilities.map((abilityInfo: any) => abilityInfo.ability.name),
+      height: detailData.height,
+      weight: detailData.weight,
+      speciesUrl: detailData.species.url,
+    };
+  } catch (e) {
+    console.error(`Error fetching basic details for ID ${id}`, e)
+    return null;
+  }
 }
 
 // =-=-=-=-=-=-= MAIN SERVICE =-=-=-=-=-=-=-=
