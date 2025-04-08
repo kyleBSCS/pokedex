@@ -81,5 +81,3 @@ This project is for educational and personal use only.
 © 2025 Kyle Nathaniel P. Vinuya. All rights reserved.
 
 _This README was created with the help of AI._
-
-```
