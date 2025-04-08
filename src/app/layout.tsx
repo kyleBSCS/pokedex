@@ -36,6 +36,7 @@ export default function RootLayout({
       >
         <TopBar />
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
