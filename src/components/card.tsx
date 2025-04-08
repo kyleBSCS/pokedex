@@ -47,7 +47,7 @@ export default function Card({
     },
   };
 
-  // Determine this card is selected
+  // Determine if this card is selected
   const isThisCardSelected = selectedPokemonId === id;
 
   // Target animation based on state

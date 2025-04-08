@@ -1,5 +1,4 @@
 // Most types present in this file were created with the help of AI.
-// Structure of the JSON for the details of a pokemon
 
 export const MAX_POKEMON_ID = 1302;
 export const POKEMON_TYPES = [
@@ -33,6 +32,7 @@ export const loadingQuotes = [
 
 export type SortByType = "id_asc" | "id_desc" | "name_asc" | "name_desc";
 
+// Types for data from the PokeAPI
 interface PokeApiGenus {
   genus: string;
   language: {
@@ -94,7 +94,6 @@ export interface PokeApiEvolutionChain {
   chain: PokeApiEvolutionNode;
 }
 
-// Structure of the JSON for the list of pokemon
 export interface PokeApiResource {
   name: string;
   url: string;
@@ -114,23 +113,6 @@ export interface PokeApiTypeResponse {
     slot: number;
     pokemon: PokeApiResource;
   }>;
-}
-
-export interface PokemonCardProps {
-  id: number;
-  name: string;
-  imageUrl: string;
-  types: string[];
-  onClick?: (id: number) => void;
-  selectedPokemonId?: number | null;
-}
-
-export interface GetPokemonOptions {
-  limit: number;
-  offset: number;
-  search?: string;
-  types?: string[];
-  sort?: SortByType;
 }
 
 export interface PokeApiRawPokemonData {
@@ -175,6 +157,16 @@ export interface PokeApiEvolutionChain {
   chain: PokeApiEvolutionNode;
 }
 
+export interface PokeApiTypeDetailResponse {
+  id: number;
+  name: string;
+  damage_relations: TypeRelations;
+  pokemon: Array<{ pokemon: PokeApiResource; slot: number }>;
+}
+
+export interface ApiPokemonDetailResponse extends PokemonDetailedViewData {}
+
+// Formatted data after getting raw data from API
 export interface EvolutionStage {
   id: number;
   name: string;
@@ -205,8 +197,6 @@ export interface PokemonDetailedViewData extends PokemonDetail {
   isMythical: boolean;
 }
 
-export interface ApiPokemonDetailResponse extends PokemonDetailedViewData {}
-
 interface TypeRelation {
   name: string;
   url: string;
@@ -221,14 +211,6 @@ interface TypeRelations {
   double_damage_from: TypeRelation[];
 }
 
-export interface PokeApiTypeDetailResponse {
-  id: number;
-  name: string;
-  damage_relations: TypeRelations;
-  pokemon: Array<{ pokemon: PokeApiResource; slot: number }>;
-}
-
-// What is returned in our service layer
 export interface ApiPokemonResponse {
   count: number;
   next: string | null;
@@ -236,6 +218,7 @@ export interface ApiPokemonResponse {
   results: PokemonCardProps[];
 }
 
+// Component Props
 export interface ButtonProps {
   name: string;
   label?: string;
@@ -248,6 +231,23 @@ export interface AppliedFilters {
   searchTerm: string;
   selectedTypes: string[];
   sortBy: SortByType;
+}
+
+export interface PokemonCardProps {
+  id: number;
+  name: string;
+  imageUrl: string;
+  types: string[];
+  onClick?: (id: number) => void;
+  selectedPokemonId?: number | null;
+}
+
+export interface GetPokemonOptions {
+  limit: number;
+  offset: number;
+  search?: string;
+  types?: string[];
+  sort?: SortByType;
 }
 
 export interface FilterBoxProps {

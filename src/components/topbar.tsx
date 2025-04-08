@@ -19,17 +19,14 @@ export default function TopBar() {
         className="relative h-full bg-white z-10" // Use bg-white for content
         style={{ clipPath: clipPathStyle }}
       >
-        {/* Your actual content goes inside the white, clipped layer */}
         <div className="flex items-center justify-between h-full pl-12">
           <button
             onClick={handleScrollToTop}
             className="text-3xl font-bold font-mono text-gray-800 focus:outline-none cursor-pointer"
-            // Add focus styling if needed, e.g., focus:ring-2 focus:ring-blue-500
           >
             Pokédex
           </button>
           <div className="flex gap-2 pr-10">
-            {/* Ensure borders here are visible against white bg */}
             <div className="rounded-full w-6 h-6 bg-red-500 border-2 border-black"></div>
             <div className="rounded-full w-6 h-6 bg-yellow-500 border-2 border-black"></div>
             <div className="rounded-full w-6 h-6 bg-green-500 border-2 border-black"></div>
