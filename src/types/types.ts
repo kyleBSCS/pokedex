@@ -197,6 +197,7 @@ export interface PokemonDetailedViewData extends PokemonDetail {
   generation: string;
   captureRate: number;
   growthRate: string;
+  genderRate: number;
   baseHappiness: number;
   habitat: string | null;
   isBaby: boolean;

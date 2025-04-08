@@ -393,6 +393,7 @@ export async function getPokemonDetailsById(
     const captureRate = speciesData.capture_rate;
     const baseHappiness = speciesData.base_happiness;
     const growthRate = speciesData.growth_rate?.name ?? "Unknown";
+    const genderRate = speciesData.gender_rate;
     const habitat = speciesData.habitat?.name ?? null;
     const generation = speciesData.generation?.name ?? "Unknown";
     const isBaby = speciesData.is_baby;
@@ -419,13 +420,14 @@ export async function getPokemonDetailsById(
     const detailedData: PokemonDetailedViewData = {
       ...basicDetails,
       species: genus,
-      description: description,
+      description,
       evolutionChain: evolutionStages,
-      weaknesses: weaknesses,
+      weaknesses,
       generation,
       captureRate,
       baseHappiness,
       growthRate,
+      genderRate,
       habitat,
       isBaby,
       isLegendary,

@@ -1,9 +1,16 @@
 import { PokemonDetailedViewData, loadingQuotes } from "@/types/types";
 import { formatPokemonId, formatStatName } from "@/utils/helper";
 import { getBGColorForType } from "@/utils/typeColors";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Mars,
+  Venus,
+  CircleSmall,
+} from "lucide-react";
 import Image from "next/image";
-import { useRef } from "react";
+import { JSX, useRef } from "react";
 
 interface DetailsProps {
   pokemonData: PokemonDetailedViewData | null;
@@ -29,6 +36,47 @@ export default function Details({
   const modalContentRef = useRef<HTMLDivElement>(null);
   const randomQuote =
     loadingQuotes[Math.floor(Math.random() * loadingQuotes.length)];
+
+  // Helper to format gender rate
+  const formatGender = (genderRate: number): JSX.Element | string => {
+    if (genderRate === -1) {
+      return (
+        <span className="inline-flex items-center gap-1">
+          <CircleSmall aria-label="Genderless" className="text-gray-500" />{" "}
+          Genderless
+        </span>
+      );
+    }
+    if (genderRate === 0) {
+      return (
+        <span className="inline-flex items-center gap-1">
+          <Mars aria-label="Male" className="text-blue-500" /> 100% Male
+        </span>
+      );
+    }
+    if (genderRate === 8) {
+      return (
+        <span className="inline-flex items-center gap-1">
+          <Venus aria-label="Female" className="text-pink-500" /> 100% Female
+        </span>
+      );
+    }
+    // Calculate ratio (female rate is in 1/8ths)
+    const femalePercentage = (genderRate / 8) * 100;
+    const malePercentage = 100 - femalePercentage;
+    return (
+      <span className="inline-flex items-center gap-2">
+        <span className="inline-flex items-center gap-1">
+          <Mars aria-label="Male" className="text-blue-500" />{" "}
+          {malePercentage.toFixed(1)}%
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <Venus aria-label="Female" className="text-pink-500" />{" "}
+          {femalePercentage.toFixed(1)}%
+        </span>
+      </span>
+    );
+  };
 
   const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) {
@@ -116,6 +164,14 @@ export default function Details({
     evolutionChain,
     weaknesses,
     generation,
+    captureRate,
+    baseHappiness,
+    growthRate,
+    genderRate,
+    habitat,
+    isBaby,
+    isLegendary,
+    isMythical,
   } = pokemonData;
   const formattedId = formatPokemonId(id);
   const formattedHeight = `${(height / 10).toFixed(1)} m`;
@@ -185,7 +241,6 @@ export default function Details({
           {/* Description */}
           <p className="font-mono font-semibold text-gray-700 text-xl tracking-tight sm:pl-4 mt-2">
             {description}
-            {generation}
           </p>
 
           {/* Base Stats */}
@@ -231,34 +286,96 @@ export default function Details({
 
         {/* Second Column: Pokedex Data, Training, Defenses, Evolution */}
         <div className="flex flex-col gap-4 sm:pl-12 flex-grow">
-          {/* Pokedex Data */}
-          <div>
-            <h3 className="text-xl lg:text-2xl font-bold mb-2">Pokédex Data</h3>
-            <div className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm lg:text-base">
-              <span className="font-semibold text-gray-600">Species</span>
-              <span className="capitalize">{species}</span>
+          <div className="flex flex-wrap gap-6">
+            {/* Pokedex Data */}
+            <div>
+              <h3 className="text-xl lg:text-2xl font-bold mb-2">
+                Pokédex Data
+              </h3>
+              <div className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm lg:text-base">
+                <span className="font-semibold text-gray-600">Species</span>
+                <span className="capitalize">{species}</span>
 
-              <span className="font-semibold text-gray-600">Height</span>
-              <span>{formattedHeight}</span>
+                <span className="font-semibold text-gray-600">Height</span>
+                <span>{formattedHeight}</span>
 
-              <span className="font-semibold text-gray-600">Weight</span>
-              <span>{formattedWeight}</span>
+                <span className="font-semibold text-gray-600">Weight</span>
+                <span>{formattedWeight}</span>
 
-              <span className="font-semibold text-gray-600">Abilities</span>
-              <span className="capitalize">
-                {abilities.map((ability, index) => (
-                  <span key={ability}>
-                    {ability.replace("-", " ")}
-                    {index < abilities.length - 1 ? ", " : ""}
-                  </span>
-                ))}
-              </span>
-              {/* Add more fields like Gender Ratio, Egg Groups if fetched */}
+                <span className="font-semibold text-gray-600">Abilities</span>
+                <span className="capitalize">
+                  {abilities.map((ability, index) => (
+                    <span key={ability}>
+                      {ability.replace("-", " ")}
+                      {index < abilities.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </span>
+                <span className="font-semibold text-gray-600">Gender</span>
+                <span>{formatGender(genderRate)}</span>
+              </div>
+            </div>
+
+            {/* Characteristics */}
+            <div className="z-10">
+              <h3 className="text-xl lg:text-2xl font-bold mb-2">
+                Characteristics
+              </h3>
+              <div className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1.5 text-sm lg:text-base">
+                <span className="font-semibold text-gray-600">
+                  Capture Rate
+                </span>
+                <span>{captureRate}</span>
+
+                <span className="font-semibold text-gray-600">
+                  Base Happiness
+                </span>
+                <span>{baseHappiness}</span>
+
+                <span className="font-semibold text-gray-600">Growth Rate</span>
+                <span className="capitalize">
+                  {growthRate.replace("-", " ")}
+                </span>
+
+                <span className="font-semibold text-gray-600">Habitat</span>
+                <span className="capitalize">{habitat ?? "Unknown"}</span>
+
+                <span className="font-semibold text-gray-600">Generation</span>
+                <span className="uppercase">
+                  {generation.replace("-", " ")}
+                </span>
+
+                {/* Optional: Boolean Flags */}
+                {(isBaby || isLegendary || isMythical) && (
+                  <>
+                    <span className="font-semibold text-gray-600 pt-2">
+                      Flags
+                    </span>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 pt-2">
+                      {isBaby && (
+                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                          Baby
+                        </span>
+                      )}
+                      {isLegendary && (
+                        <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                          Legendary
+                        </span>
+                      )}
+                      {isMythical && (
+                        <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                          Mythical
+                        </span>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Weaknesses  */}
-          <div>
+          <div className="z-10">
             <h3 className="text-xl lg:text-2xl font-bold">Weaknesses</h3>
             <p className="mb-4 text-gray-800">
               These types will be effective against{" "}
@@ -266,7 +383,7 @@ export default function Details({
                 name.split("-")[0].slice(1)}
               .
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 ">
               {weaknesses.map((weakness) => (
                 <div
                   key={weakness.type}
@@ -336,9 +453,11 @@ export default function Details({
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col lg:flex-row items-center justify-around gap-2 flex-wrap lg:flex-nowrap bg-gray-100 rounded-2xl p-2 z-10">
-                <p className="text-center capitalize">
-                  {name.split("-")[0]} does not evolve.
+              <div className="flex flex-col lg:flex-row items-center justify-around gap-2 flex-wrap lg:flex-nowrap bg-gray-100 rounded-2xl p-2 py-6 z-10">
+                <p className="text-center">
+                  {name.split("-")[0].charAt(0).toUpperCase() +
+                    name.split("-")[0].slice(1)}{" "}
+                  does not evolve.
                 </p>
               </div>
             )}
@@ -376,7 +495,7 @@ export default function Details({
         </div>
 
         {/* Background Element of ID */}
-        <div className="hidden lg:block absolute top-4 right-6 text-9xl text-gray-300 font-sans pointer-events-none">
+        <div className="hidden lg:block absolute top-4 right-6 md:text-7xl xl:text-8xl 2xl:text-9xl text-gray-300 font-sans pointer-events-none z-0">
           {formattedId}
         </div>
 
