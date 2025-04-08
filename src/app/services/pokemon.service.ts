@@ -287,6 +287,7 @@ async function calculateWeaknesses(
 }
 
 // =-=-=-=-=-=-= MAIN SERVICE =-=-=-=-=-=-=-=
+// For getting pokemon for cards in list view
 export async function getPokemon(
   options: GetPokemonOptions
 ): Promise<{ pokemon: PokemonCardProps[]; totalCount: number }> {
