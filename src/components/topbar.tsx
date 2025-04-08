@@ -10,13 +10,15 @@ export default function TopBar() {
 
   return (
     <div className="w-5/6 h-16 sticky top-0 z-10 relative p-[1.5px] ">
+      {/* For the border */}
       <div
-        className="absolute inset-0 bg-black z-0" // Use bg-black for border color
+        className="absolute inset-0 bg-black z-0"
         style={{ clipPath: clipPathStyle }}
       />
 
+      {/* For the content */}
       <div
-        className="relative h-full bg-white z-10" // Use bg-white for content
+        className="relative h-full bg-white z-10"
         style={{ clipPath: clipPathStyle }}
       >
         <div className="flex items-center justify-between h-full pl-12">
