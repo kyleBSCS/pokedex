@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { IBM_Plex_Sans_Condensed, League_Gothic } from "next/font/google";
 import "./globals.css";
 import TopBar from "@/components/topbar";
