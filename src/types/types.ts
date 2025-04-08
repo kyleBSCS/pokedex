@@ -33,24 +33,6 @@ export const loadingQuotes = [
 
 export type SortByType = "id_asc" | "id_desc" | "name_asc" | "name_desc";
 
-interface PokeApiStat {
-  base_stat: number;
-  effort: number;
-  stat: {
-    name: string;
-    url: string;
-  };
-}
-
-interface PokeApiAbility {
-  ability: {
-    name: string;
-    url: string;
-  };
-  is_hidden: boolean;
-  slot: number;
-}
-
 interface PokeApiGenus {
   genus: string;
   language: {
@@ -212,6 +194,14 @@ export interface PokemonDetailedViewData extends PokemonDetail {
   description: string;
   evolutionChain: EvolutionStage[];
   weaknesses: Array<{ type: string; effectiveness: number }>;
+  generation: string;
+  captureRate: number;
+  growthRate: string;
+  baseHappiness: number;
+  habitat: string | null;
+  isBaby: boolean;
+  isLegendary: boolean;
+  isMythical: boolean;
 }
 
 export interface ApiPokemonDetailResponse extends PokemonDetailedViewData {}

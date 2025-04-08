@@ -115,6 +115,7 @@ export default function Details({
     abilities,
     evolutionChain,
     weaknesses,
+    generation,
   } = pokemonData;
   const formattedId = formatPokemonId(id);
   const formattedHeight = `${(height / 10).toFixed(1)} m`;
@@ -184,6 +185,7 @@ export default function Details({
           {/* Description */}
           <p className="font-mono font-semibold text-gray-700 text-xl tracking-tight sm:pl-4 mt-2">
             {description}
+            {generation}
           </p>
 
           {/* Base Stats */}

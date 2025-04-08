@@ -1,7 +1,6 @@
 import {
   PokemonCardProps,
   PokemonDetail,
-  SortByType,
   PokeApiResource,
   PokeApiPokemonListResponse,
   PokeApiTypeResponse,
@@ -16,6 +15,7 @@ import {
   POKEMON_TYPES,
   MAX_POKEMON_ID,
 } from "@/types/types";
+
 import { formatPokemonId } from "@/utils/helper";
 const BASE_URL = "https://pokeapi.co/api/v2";
 
@@ -375,7 +375,7 @@ export async function getPokemonDetailsById(
       throw new Error(`Could not fetch basic details for Pokemon ${id}`);
     }
 
-    // STEP 2: Fetch Specied Data
+    // STEP 2: Fetch Species Data
     const speciesRes = await fetch(basicDetails.speciesUrl);
     if (!speciesRes.ok) {
       throw new Error(`Failed to fetch species data ${speciesRes.statusText}`);
@@ -389,6 +389,15 @@ export async function getPokemonDetailsById(
       speciesData.flavor_text_entries
         ?.find((ft) => ft.language.name === "en")
         ?.flavor_text?.replace(/[\n\f]/g, " ") ?? "No description available.";
+
+    const captureRate = speciesData.capture_rate;
+    const baseHappiness = speciesData.base_happiness;
+    const growthRate = speciesData.growth_rate?.name ?? "Unknown";
+    const habitat = speciesData.habitat?.name ?? null;
+    const generation = speciesData.generation?.name ?? "Unknown";
+    const isBaby = speciesData.is_baby;
+    const isLegendary = speciesData.is_legendary;
+    const isMythical = speciesData.is_mythical;
 
     // STEP 3: Fetch Evolution Chain Data
     const evolutionChainUrl = speciesData.evolution_chain.url;
@@ -406,13 +415,21 @@ export async function getPokemonDetailsById(
     // STEP 5: Calculatge weaknesses using types
     const weaknesses = await calculateWeaknesses(basicDetails.types);
 
-    // STEP 5: Combine all data
+    // STEP 6: Combine all data
     const detailedData: PokemonDetailedViewData = {
       ...basicDetails,
       species: genus,
       description: description,
       evolutionChain: evolutionStages,
       weaknesses: weaknesses,
+      generation,
+      captureRate,
+      baseHappiness,
+      growthRate,
+      habitat,
+      isBaby,
+      isLegendary,
+      isMythical,
     };
 
     console.log(`Successfully fetched detailed data for ${detailedData.name}`);
