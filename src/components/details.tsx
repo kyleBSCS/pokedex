@@ -201,7 +201,7 @@ export default function Details({
           <div className="relative w-full flex justify-center items-center ">
             {/* Background Rectangle */}
             <div
-              className="absolute w-[250px] h-[250px] sm:w-[150px] sm:h-[150px] lg:w-[250px] lg:h-[250px] rounded-4xl"
+              className="absolute w-[220px] h-[220px] sm:w-[150px] sm:h-[150px] lg:w-[250px] lg:h-[250px] rounded-4xl"
               style={{ backgroundColor: getBGColorForType(types[0]) }}
             ></div>
             {/* Pokémon Image */}
