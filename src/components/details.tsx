@@ -304,10 +304,10 @@ export default function Details({
 
                 <span className="font-semibold text-gray-600">Abilities</span>
                 <span className="capitalize">
-                  {abilities.map((ability, index) => (
+                  {[...new Set(abilities)].map((ability, index) => (
                     <span key={ability}>
                       {ability.replace("-", " ")}
-                      {index < abilities.length - 1 ? ", " : ""}
+                      {index < [...new Set(abilities)].length - 1 ? ", " : ""}
                     </span>
                   ))}
                 </span>
