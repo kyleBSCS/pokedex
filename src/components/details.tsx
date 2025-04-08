@@ -212,6 +212,7 @@ export default function Details({
               height={300}
               alt={name}
               className="relative select-none"
+              priority
             />
           </div>
 
