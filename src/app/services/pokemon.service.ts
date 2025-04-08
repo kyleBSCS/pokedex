@@ -275,6 +275,7 @@ async function calculateWeaknesses(
 
     // Filter non-weaknesses (effectiveness <= 1) and format result
     const weaknesses = Object.entries(typeEffectiveness)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([_, effectiveness]) => effectiveness > 1)
       .map(([type, effectiveness]) => ({ type, effectiveness }))
       .sort((a, b) => b.effectiveness - a.effectiveness);

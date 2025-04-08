@@ -164,8 +164,6 @@ export interface PokeApiTypeDetailResponse {
   pokemon: Array<{ pokemon: PokeApiResource; slot: number }>;
 }
 
-export interface ApiPokemonDetailResponse extends PokemonDetailedViewData {}
-
 // Formatted data after getting raw data from API
 export interface EvolutionStage {
   id: number;

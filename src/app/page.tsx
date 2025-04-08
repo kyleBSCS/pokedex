@@ -10,7 +10,6 @@ import {
   SortByType,
   AppliedFilters,
   PokemonDetailedViewData,
-  ApiPokemonDetailResponse,
   loadingQuotes,
 } from "@/types/types";
 import Card from "@/components/card";
@@ -47,7 +46,6 @@ export default function Home() {
   // For the trigger that loads more cards
   const observerRef = useRef<HTMLDivElement | null>(null);
   const isFetchingRef = useRef(false);
-  const isInitialLoadRef = useRef(true);
 
   // =-=-=-=-=-= FETCHER =-=-=-=-=-=
   // Memoized callback function for fetching pokemon
@@ -156,7 +154,7 @@ export default function Home() {
           throw new Error(errData.message || `API Error: ${res.statusText}`);
         }
 
-        const data: ApiPokemonDetailResponse = await res.json();
+        const data: PokemonDetailedViewData = await res.json();
         setDetailedPokemonData(data);
       } catch (e: any) {
         console.error(`Failed to fetch details for Pokemon ${id}`);
@@ -226,8 +224,10 @@ export default function Home() {
 
   // =-=-=-=-=-= EFFECTS =-=-=-=-=-=
   // Initial load
+
   useEffect(() => {
     fetchPokemon(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Effect for infinite load (Scroll)

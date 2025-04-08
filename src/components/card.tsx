@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import { PokemonCardProps } from "@/types/types";
@@ -15,7 +15,6 @@ export default function Card({
   onClick,
   selectedPokemonId,
 }: PokemonCardProps) {
-  const [isSelected, setIsSelected] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
