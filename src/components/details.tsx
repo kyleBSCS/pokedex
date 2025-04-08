@@ -345,25 +345,23 @@ export default function Details({
                   {generation.replace("-", " ")}
                 </span>
 
-                {/* Optional: Boolean Flags */}
+                {/* Boolean Flags */}
                 {(isBaby || isLegendary || isMythical) && (
                   <>
-                    <span className="font-semibold text-gray-600 pt-2">
-                      Flags
-                    </span>
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 pt-2">
+                    <span className="font-semibold text-gray-600">Flags</span>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1">
                       {isBaby && (
-                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
                           Baby
                         </span>
                       )}
                       {isLegendary && (
-                        <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
                           Legendary
                         </span>
                       )}
                       {isMythical && (
-                        <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
                           Mythical
                         </span>
                       )}
