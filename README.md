@@ -78,6 +78,14 @@ Live Site: https://pokedex-navy-two.vercel.app
 
 ---
 
+## Further Improvements
+1. Smoother loading when user scrolls too fast.
+2. Skeletons when loading instead of explicit loading modal.
+3. Pre-load repetitive images (such as the BG pokedex on detail modal).
+4. Actual caching of both pokemon list and details to local storage.
+
+---
+
 ## 📜 License
 
 This project is for educational and personal use only.
